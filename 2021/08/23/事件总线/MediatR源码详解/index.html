@@ -1,0 +1,724 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" href="/img/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="多拉多拉曼">
+  <meta name="keywords" content="Asp.Net .NetCore .Net C#">
+  
+    <meta name="description" content="MediatR源码详解(就差手摸手了)一、项目介绍  &amp;ensp;&amp;ensp;&amp;ensp;&amp;ensp;MediatR是.NET中一种简单的实现进程内的消息传递机制的类库。支持同步或者异步的形式进行请求响应，命令，查询。通知和事件的传递  &amp;ensp;&amp;ensp;&amp;ensp;&amp;ensp;github地址：https:&#x2F;&#x2F;github.c">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MediatR源码详解">
+<meta property="og:url" content="http://blog.renzhichu.top/2021/08/23/%E4%BA%8B%E4%BB%B6%E6%80%BB%E7%BA%BF/MediatR%E6%BA%90%E7%A0%81%E8%AF%A6%E8%A7%A3/index.html">
+<meta property="og:site_name" content="多拉多拉曼的博客">
+<meta property="og:description" content="MediatR源码详解(就差手摸手了)一、项目介绍  &amp;ensp;&amp;ensp;&amp;ensp;&amp;ensp;MediatR是.NET中一种简单的实现进程内的消息传递机制的类库。支持同步或者异步的形式进行请求响应，命令，查询。通知和事件的传递  &amp;ensp;&amp;ensp;&amp;ensp;&amp;ensp;github地址：https:&#x2F;&#x2F;github.c">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20200715192157204.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0NBUEZfc2t5,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20200715192244487.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0NBUEZfc2t5,size_16,color_FFFFFF,t_70">
+<meta property="article:published_time" content="2021-08-23T03:19:34.000Z">
+<meta property="article:modified_time" content="2022-10-17T08:03:12.060Z">
+<meta property="article:author" content="多拉多拉曼">
+<meta property="article:tag" content="MediatR">
+<meta property="article:tag" content="EventBus">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/20200715192157204.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0NBUEZfc2t5,size_16,color_FFFFFF,t_70">
+  
+  
+  
+  <title>MediatR源码详解 - 多拉多拉曼的博客</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"blog.renzhichu.top","root":"/","version":"1.9.1","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>多拉多拉曼</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="MediatR源码详解"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2021-08-23 11:19" pubdate>
+          2021年8月23日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          <!-- compatible with older versions-->
+          25k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          <!-- compatible with older versions-->
+          208 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">MediatR源码详解</h1>
+            
+            <div class="markdown-body">
+              
+              <h1 id="MediatR源码详解-就差手摸手了"><a href="#MediatR源码详解-就差手摸手了" class="headerlink" title="MediatR源码详解(就差手摸手了)"></a>MediatR源码详解(就差手摸手了)</h1><h2 id="一、项目介绍"><a href="#一、项目介绍" class="headerlink" title="一、项目介绍"></a>一、项目介绍</h2><p>  &amp;ensp;&amp;ensp;&amp;ensp;&amp;ensp;MediatR是.NET中一种简单的实现进程内的消息传递机制的类库。支持同步或者异步的形式进行请求响应，命令，查询。通知和事件的传递<br><br>  &amp;ensp;&amp;ensp;&amp;ensp;&amp;ensp;github地址：<a target="_blank" rel="noopener" href="https://github.com/jbogard/MediatR">https://github.com/jbogard/MediatR</a><br><br>  &amp;ensp;&amp;ensp;&amp;ensp;&amp;ensp;作者：jbogard <br></p>
+<h2 id="二、源码分析"><a href="#二、源码分析" class="headerlink" title="二、源码分析"></a>二、源码分析</h2><h3 id="2-1、消息传递之单点传递："><a href="#2-1、消息传递之单点传递：" class="headerlink" title="2.1、消息传递之单点传递："></a>2.1、消息传递之单点传递：</h3><p>&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;所谓的单点传递，就是在消息传递中，存在一个发消息的，还存在一个接收消息的，就像生活中，我们聊QQ&#x2F;微信就属于消息传递，而我们现在要聊的就是消息传递中的单点传递也就是私聊，一对一的进行传递。</p>
+<h4 id="2-1-1-IRequest-接口："><a href="#2-1-1-IRequest-接口：" class="headerlink" title="2.1.1 IRequest 接口："></a>2.1.1 IRequest 接口：</h4>  <figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs csharp"><br><span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;summary&gt;</span></span><br><span class="hljs-comment"><span class="hljs-doctag">///</span> Marker interface to represent a request with a void response</span><br><span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;/summary&gt;</span></span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">interface</span> <span class="hljs-title">IRequest</span> : <span class="hljs-title">IRequest</span>&lt;<span class="hljs-title">Unit</span>&gt; &#123; &#125;<br><br><span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;summary&gt;</span></span><br><span class="hljs-comment"><span class="hljs-doctag">///</span> Marker interface to represent a request with a response</span><br><span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;/summary&gt;</span></span><br><span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;typeparam name=&quot;TResponse&quot;&gt;</span>Response type<span class="hljs-doctag">&lt;/typeparam&gt;</span></span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">interface</span> <span class="hljs-title">IRequest</span>&lt;<span class="hljs-keyword">out</span> <span class="hljs-title">TResponse</span>&gt; : <span class="hljs-title">IBaseRequest</span> &#123; &#125;<br><br><span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;summary&gt;</span></span><br><span class="hljs-comment"><span class="hljs-doctag">///</span> Allows for generic type constraints of objects implementing IRequest or IRequest&#123;TResponse&#125;</span><br><span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;/summary&gt;</span></span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">interface</span> <span class="hljs-title">IBaseRequest</span> &#123; &#125;<br><br></code></pre></td></tr></table></figure>
+<p>  &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;IRequest相关接口,在消息传递中，是用于一对一的消息传递参数请求所定义相关参数规范的接口，可以理解为定义消息传递的参数格式所需要的接口 我们可以看到，这里有三个相关接口，最底层的是IBaseRequest接口，然后是一个IRequest&lt;TRequest&gt;接口，最后是IRequest接口,首先讲一下三个接口，IBaseRequest接口，其实就是最基础的接口，起到了一个类型约束的作用，所有的参数类型，都必须继承自IBaseRequst接口，而IRequestt&lt;TRequest&gt;接口呢，则是定义了在消息传递的逻辑处理中，所需要返回的返回值的类型，这样就起到了，消息的传递以及响应的作用，发出消息也定义了这个消息所需要的响应是什么。最后一个IRequest接口，继承于IRequest&lt;Unit&gt;接口，这是什么意思呢，这就很厉害了，它是用Unit结构，来当作返回类型，从而实现了无返回值的消息参数类型。</p>
+<h3 id="2-1-2-IRequestHandler接口："><a href="#2-1-2-IRequestHandler接口：" class="headerlink" title="2.1.2 IRequestHandler接口："></a>2.1.2 IRequestHandler接口：</h3><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br></pre></td><td class="code"><pre><code class="hljs csharp"><br><span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;summary&gt;</span></span><br><span class="hljs-comment"><span class="hljs-doctag">///</span> Defines a handler for a request</span><br><span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;/summary&gt;</span></span><br><span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;typeparam name=&quot;TRequest&quot;&gt;</span>The type of request being handled<span class="hljs-doctag">&lt;/typeparam&gt;</span></span><br><span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;typeparam name=&quot;TResponse&quot;&gt;</span>The type of response from the handler<span class="hljs-doctag">&lt;/typeparam&gt;</span></span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">interface</span> <span class="hljs-title">IRequestHandler</span>&lt;<span class="hljs-keyword">in</span> <span class="hljs-title">TRequest</span>, <span class="hljs-title">TResponse</span>&gt; <span class="hljs-keyword">where</span> <span class="hljs-title">TRequest</span> : <span class="hljs-title">IRequest</span>&lt;<span class="hljs-title">TResponse</span>&gt;<br>&#123;<br>    <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;summary&gt;</span></span><br>    <span class="hljs-comment"><span class="hljs-doctag">///</span> Handles a request</span><br>    <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;/summary&gt;</span></span><br>    <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;param name=&quot;request&quot;&gt;</span>The request<span class="hljs-doctag">&lt;/param&gt;</span></span><br>    <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;param name=&quot;cancellationToken&quot;&gt;</span>Cancellation token<span class="hljs-doctag">&lt;/param&gt;</span></span><br>    <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;returns&gt;</span>Response from the request<span class="hljs-doctag">&lt;/returns&gt;</span></span><br>    <span class="hljs-function">Task&lt;TResponse&gt; <span class="hljs-title">Handle</span>(<span class="hljs-params">TRequest request, CancellationToken cancellationToken</span>)</span>;<br>&#125;<br><br><span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;summary&gt;</span></span><br><span class="hljs-comment"><span class="hljs-doctag">///</span> Defines a handler for a request with a void (<span class="hljs-doctag">&lt;see cref=&quot;Unit&quot; /&gt;</span>) response.</span><br><span class="hljs-comment"><span class="hljs-doctag">///</span> You do not need to register this interface explicitly with a container as it inherits from the base <span class="hljs-doctag">&lt;see cref=&quot;IRequestHandler&#123;TRequest, TResponse&#125;&quot; /&gt;</span> interface.</span><br><span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;/summary&gt;</span></span><br><span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;typeparam name=&quot;TRequest&quot;&gt;</span>The type of request being handled<span class="hljs-doctag">&lt;/typeparam&gt;</span></span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">interface</span> <span class="hljs-title">IRequestHandler</span>&lt;<span class="hljs-keyword">in</span> <span class="hljs-title">TRequest</span>&gt; : <span class="hljs-title">IRequestHandler</span>&lt;<span class="hljs-title">TRequest</span>, <span class="hljs-title">Unit</span>&gt;  <span class="hljs-keyword">where</span> <span class="hljs-title">TRequest</span> : <span class="hljs-title">IRequest</span>&lt;<span class="hljs-title">Unit</span>&gt;<br>&#123;<br>&#125;<br><br><span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;summary&gt;</span></span><br><span class="hljs-comment"><span class="hljs-doctag">///</span> Wrapper class for a handler that asynchronously handles a request and does not return a response</span><br><span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;/summary&gt;</span></span><br><span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;typeparam name=&quot;TRequest&quot;&gt;</span>The type of request being handled<span class="hljs-doctag">&lt;/typeparam&gt;</span></span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">abstract</span> <span class="hljs-keyword">class</span> <span class="hljs-title">AsyncRequestHandler</span>&lt;<span class="hljs-title">TRequest</span>&gt; : <span class="hljs-title">IRequestHandler</span>&lt;<span class="hljs-title">TRequest</span>&gt; <span class="hljs-keyword">where</span> <span class="hljs-title">TRequest</span> : <span class="hljs-title">IRequest</span><br>&#123;<br>    <span class="hljs-keyword">async</span> Task&lt;Unit&gt; IRequestHandler&lt;TRequest, Unit&gt;.Handle(TRequest request, CancellationToken cancellationToken)<br>    &#123;<br>        <span class="hljs-keyword">await</span> Handle(request, cancellationToken).ConfigureAwait(<span class="hljs-literal">false</span>);<br>        <span class="hljs-keyword">return</span> Unit.Value;<br>    &#125;<br><br>    <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;summary&gt;</span></span><br>    <span class="hljs-comment"><span class="hljs-doctag">///</span> Override in a derived class for the handler logic</span><br>    <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;/summary&gt;</span></span><br>    <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;param name=&quot;request&quot;&gt;</span>Request<span class="hljs-doctag">&lt;/param&gt;</span></span><br>    <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;param name=&quot;cancellationToken&quot;&gt;</span><span class="hljs-doctag">&lt;/param&gt;</span></span><br>    <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;returns&gt;</span>Response<span class="hljs-doctag">&lt;/returns&gt;</span></span><br>    <span class="hljs-function"><span class="hljs-keyword">protected</span> <span class="hljs-keyword">abstract</span> Task <span class="hljs-title">Handle</span>(<span class="hljs-params">TRequest request, CancellationToken cancellationToken</span>)</span>;<br>&#125;<br><br><span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;summary&gt;</span></span><br><span class="hljs-comment"><span class="hljs-doctag">///</span> Wrapper class for a handler that synchronously handles a request and returns a response</span><br><span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;/summary&gt;</span></span><br><span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;typeparam name=&quot;TRequest&quot;&gt;</span>The type of request being handled<span class="hljs-doctag">&lt;/typeparam&gt;</span></span><br><span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;typeparam name=&quot;TResponse&quot;&gt;</span>The type of response from the handler<span class="hljs-doctag">&lt;/typeparam&gt;</span></span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">abstract</span> <span class="hljs-keyword">class</span> <span class="hljs-title">RequestHandler</span>&lt;<span class="hljs-title">TRequest</span>, <span class="hljs-title">TResponse</span>&gt; : <span class="hljs-title">IRequestHandler</span>&lt;<span class="hljs-title">TRequest</span>, <span class="hljs-title">TResponse</span>&gt; <span class="hljs-keyword">where</span> <span class="hljs-title">TRequest</span> : <span class="hljs-title">IRequest</span>&lt;<span class="hljs-title">TResponse</span>&gt;<br>&#123;<br>    Task&lt;TResponse&gt; IRequestHandler&lt;TRequest, TResponse&gt;.Handle(TRequest request, CancellationToken cancellationToken)<br>        =&gt; Task.FromResult(Handle(request));<br><br>    <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;summary&gt;</span></span><br>    <span class="hljs-comment"><span class="hljs-doctag">///</span> Override in a derived class for the handler logic</span><br>    <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;/summary&gt;</span></span><br>    <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;param name=&quot;request&quot;&gt;</span>Request<span class="hljs-doctag">&lt;/param&gt;</span></span><br>    <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;returns&gt;</span>Response<span class="hljs-doctag">&lt;/returns&gt;</span></span><br>    <span class="hljs-function"><span class="hljs-keyword">protected</span> <span class="hljs-keyword">abstract</span> TResponse <span class="hljs-title">Handle</span>(<span class="hljs-params">TRequest request</span>)</span>;<br>&#125;<br><br><span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;summary&gt;</span></span><br><span class="hljs-comment"><span class="hljs-doctag">///</span> Wrapper class for a handler that synchronously handles a request does not return a response</span><br><span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;/summary&gt;</span></span><br><span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;typeparam name=&quot;TRequest&quot;&gt;</span>The type of request being handled<span class="hljs-doctag">&lt;/typeparam&gt;</span></span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">abstract</span> <span class="hljs-keyword">class</span> <span class="hljs-title">RequestHandler</span>&lt;<span class="hljs-title">TRequest</span>&gt; : <span class="hljs-title">IRequestHandler</span>&lt;<span class="hljs-title">TRequest</span>&gt; <span class="hljs-keyword">where</span> <span class="hljs-title">TRequest</span> : <span class="hljs-title">IRequest</span><br>&#123;<br>    Task&lt;Unit&gt; IRequestHandler&lt;TRequest, Unit&gt;.Handle(TRequest request, CancellationToken cancellationToken)<br>    &#123;<br>        Handle(request);<br>        <span class="hljs-keyword">return</span> Unit.Task;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">protected</span> <span class="hljs-keyword">abstract</span> <span class="hljs-keyword">void</span> <span class="hljs-title">Handle</span>(<span class="hljs-params">TRequest request</span>)</span>;<br>&#125;<br><br></code></pre></td></tr></table></figure>
+
+<p>&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;既然说到了微信聊天，我们肯定知道聊天最起码得是俩人的事，特别是私聊，对面必须的有一个消息接收者，没有接收者我们发出去的就不是消息，而是寂寞。而IRequestHandler接口的主要作用是接收消息参数进行响应的逻辑处理,在这个接口下面，还有三个抽象类，采用的是包装器模式，对这个接口进行额外的功能实现，<br>可以看出，这三个抽象类实现了有响应，无响应这两种情况的同步以及异步不同模式下的处理方式（就像Boss直聘里面经常出现的：消息未读、已读不回、还有已读明天回），而方法中的抽象方法更是为了在不同情况下，所继承的实现类根据具体业务来实现具体逻辑使用。</p>
+<h3 id="2-2、消息传递之消息通知"><a href="#2-2、消息传递之消息通知" class="headerlink" title="2.2、消息传递之消息通知"></a>2.2、消息传递之消息通知</h3><p>&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;通知,这个就有趣了，通知可以是单独通知一个人，也可以通知一群人，在经历2020年初疫情之后，大家肯定对网上很火某地村长拿大喇叭喊话通知这段视频记忆犹新吧，从这里我们就可以看出消息的通知，可以是针对一到N个人进行通知的，而且通知后不需要每个人进行回复响应，想要接收到通知以后有条不紊的做就完了。所以接下来说的就是项目中通知的实现。</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><code class="hljs csharp"><br><span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;summary&gt;</span></span><br><span class="hljs-comment"><span class="hljs-doctag">///</span> Marker interface to represent a notification</span><br><span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;/summary&gt;</span></span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">interface</span> <span class="hljs-title">INotification</span> &#123; &#125;<br><br><span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;summary&gt;</span></span><br><span class="hljs-comment"><span class="hljs-doctag">///</span> Defines a handler for a notification</span><br><span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;/summary&gt;</span></span><br><span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;typeparam name=&quot;TNotification&quot;&gt;</span>The type of notification being handled<span class="hljs-doctag">&lt;/typeparam&gt;</span></span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">interface</span> <span class="hljs-title">INotificationHandler</span>&lt;<span class="hljs-keyword">in</span> <span class="hljs-title">TNotification</span>&gt; <span class="hljs-keyword">where</span> <span class="hljs-title">TNotification</span> : <span class="hljs-title">INotification</span><br>&#123;<br>    <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;summary&gt;</span></span><br>    <span class="hljs-comment"><span class="hljs-doctag">///</span> Handles a notification</span><br>    <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;/summary&gt;</span></span><br>    <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;param name=&quot;notification&quot;&gt;</span>The notification<span class="hljs-doctag">&lt;/param&gt;</span></span><br>    <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;param name=&quot;cancellationToken&quot;&gt;</span>Cancellation token<span class="hljs-doctag">&lt;/param&gt;</span></span><br>    <span class="hljs-function">Task <span class="hljs-title">Handle</span>(<span class="hljs-params">TNotification notification, CancellationToken cancellationToken</span>)</span>;<br>&#125;<br><br><span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;summary&gt;</span></span><br><span class="hljs-comment"><span class="hljs-doctag">///</span> Wrapper class for a synchronous notification handler</span><br><span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;/summary&gt;</span></span><br><span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;typeparam name=&quot;TNotification&quot;&gt;</span>The notification type<span class="hljs-doctag">&lt;/typeparam&gt;</span></span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">abstract</span> <span class="hljs-keyword">class</span> <span class="hljs-title">NotificationHandler</span>&lt;<span class="hljs-title">TNotification</span>&gt; : <span class="hljs-title">INotificationHandler</span>&lt;<span class="hljs-title">TNotification</span>&gt; <span class="hljs-keyword">where</span> <span class="hljs-title">TNotification</span> : <span class="hljs-title">INotification</span><br>&#123;<br>    Task INotificationHandler&lt;TNotification&gt;.Handle(TNotification notification, CancellationToken cancellationToken)<br>    &#123;<br>        Handle(notification);<br>        <span class="hljs-keyword">return</span> Unit.Task;<br>    &#125;<br><br>    <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;summary&gt;</span></span><br>    <span class="hljs-comment"><span class="hljs-doctag">///</span> Override in a derived class for the handler logic</span><br>    <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;/summary&gt;</span></span><br>    <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;param name=&quot;notification&quot;&gt;</span>Notification<span class="hljs-doctag">&lt;/param&gt;</span></span><br>    <span class="hljs-function"><span class="hljs-keyword">protected</span> <span class="hljs-keyword">abstract</span> <span class="hljs-keyword">void</span> <span class="hljs-title">Handle</span>(<span class="hljs-params">TNotification notification</span>)</span>;<br>&#125;<br><br></code></pre></td></tr></table></figure>
+
+<p>&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;通知，既然是一对多的，那么什么人可以收到通知呢？我们从上面代码可以看到通知只有一个简单的INotification接口，他的作用也仅仅是起到个类型约束的作用，所有发送的通知类都必须继承此接口，但是如何去接收指定类型通知呢？或者换句话说，我怎么知道这个通知是不是通知给我的呢？我们先把这个问题放在这里，后面会讲到。</p>
+<h3 id="2-3、消息处理管道"><a href="#2-3、消息处理管道" class="headerlink" title="2.3、消息处理管道"></a>2.3、消息处理管道</h3><p>&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;消息处理管道，管道我们都知道，就不再赘述了，就是你脑子里想到的那个东西，不管你想到的是啥，反正作用差不多，那么消息处理管道是干什么的，我们先看源码</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs csharp"><br><span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;summary&gt;</span></span><br><span class="hljs-comment"><span class="hljs-doctag">///</span> Represents an async continuation for the next task to execute in the pipeline</span><br><span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;/summary&gt;</span></span><br><span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;typeparam name=&quot;TResponse&quot;&gt;</span>Response type<span class="hljs-doctag">&lt;/typeparam&gt;</span></span><br><span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;returns&gt;</span>Awaitable task returning a <span class="hljs-doctag">&lt;typeparamref name=&quot;TResponse&quot;/&gt;</span><span class="hljs-doctag">&lt;/returns&gt;</span></span><br><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-built_in">delegate</span> <span class="hljs-title">Task</span>&lt;<span class="hljs-title">TResponse</span>&gt; <span class="hljs-title">RequestHandlerDelegate</span>&lt;<span class="hljs-title">TResponse</span>&gt;()</span>;<br><br><span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;summary&gt;</span></span><br><span class="hljs-comment"><span class="hljs-doctag">///</span> Pipeline behavior to surround the inner handler.</span><br><span class="hljs-comment"><span class="hljs-doctag">///</span> Implementations add additional behavior and await the next delegate.</span><br><span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;/summary&gt;</span></span><br><span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;typeparam name=&quot;TRequest&quot;&gt;</span>Request type<span class="hljs-doctag">&lt;/typeparam&gt;</span></span><br><span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;typeparam name=&quot;TResponse&quot;&gt;</span>Response type<span class="hljs-doctag">&lt;/typeparam&gt;</span></span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">interface</span> <span class="hljs-title">IPipelineBehavior</span>&lt;<span class="hljs-keyword">in</span> <span class="hljs-title">TRequest</span>, <span class="hljs-title">TResponse</span>&gt; <span class="hljs-keyword">where</span> <span class="hljs-title">TRequest</span> : <span class="hljs-title">notnull</span><br>&#123;<br>    <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;summary&gt;</span></span><br>    <span class="hljs-comment"><span class="hljs-doctag">///</span> Pipeline handler. Perform any additional behavior and await the <span class="hljs-doctag">&lt;paramref name=&quot;next&quot;/&gt;</span> delegate as necessary</span><br>    <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;/summary&gt;</span></span><br>    <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;param name=&quot;request&quot;&gt;</span>Incoming request<span class="hljs-doctag">&lt;/param&gt;</span></span><br>    <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;param name=&quot;cancellationToken&quot;&gt;</span>Cancellation token<span class="hljs-doctag">&lt;/param&gt;</span></span><br>    <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;param name=&quot;next&quot;&gt;</span>Awaitable delegate for the next action in the pipeline. Eventually this delegate represents the handler.<span class="hljs-doctag">&lt;/param&gt;</span></span><br>    <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;returns&gt;</span>Awaitable task returning the <span class="hljs-doctag">&lt;typeparamref name=&quot;TResponse&quot;/&gt;</span><span class="hljs-doctag">&lt;/returns&gt;</span></span><br>    <span class="hljs-function">Task&lt;TResponse&gt; <span class="hljs-title">Handle</span>(<span class="hljs-params">TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate&lt;TResponse&gt; next</span>)</span>;<br>&#125;<br><br></code></pre></td></tr></table></figure>
+<p>&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;所谓请求处理管道，即在传递传递过程对消息进行额外处理的，举个不恰当的例子，大家都见过流水线，一批批产品放在流水线上，然后过一个地方就会被进行相应的处理，比如可口可乐吧，先是装瓶、然后盖盖、然后包装、喷日期、这系列下来最后才成为一个可以出场的产品，大家可以把请求处理管道理解从请求到接收请求处理的过程看作一个流水线，然后管道处理程序就像是装瓶喷日期等操作，虽然不恰当，但是我个人觉得，很形象，在管道中我们可以先校验信息的安全性，以及参数的是否符合规范，熟悉.NetCore的应该可以立马想起来.NET Core中的请求管道和中间件的构建，先构建管道，然后再消息传递过程中去执行管道。<br></p>
+<p>在IPipelineBehavior接口下还实现了有两个类：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><code class="hljs csharp"><br><span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;summary&gt;</span></span><br><span class="hljs-comment"><span class="hljs-doctag">///</span> Behavior for executing all <span class="hljs-doctag">&lt;see cref=&quot;IRequestPreProcessor&#123;TRequest&#125;&quot;/&gt;</span> instances before handling a request</span><br><span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;/summary&gt;</span></span><br><span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;typeparam name=&quot;TRequest&quot;&gt;</span><span class="hljs-doctag">&lt;/typeparam&gt;</span></span><br><span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;typeparam name=&quot;TResponse&quot;&gt;</span><span class="hljs-doctag">&lt;/typeparam&gt;</span></span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">RequestPreProcessorBehavior</span>&lt;<span class="hljs-title">TRequest</span>, <span class="hljs-title">TResponse</span>&gt; : <span class="hljs-title">IPipelineBehavior</span>&lt;<span class="hljs-title">TRequest</span>, <span class="hljs-title">TResponse</span>&gt;<br>    <span class="hljs-keyword">where</span> <span class="hljs-title">TRequest</span> : <span class="hljs-title">notnull</span><br>&#123;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">readonly</span> IEnumerable&lt;IRequestPreProcessor&lt;TRequest&gt;&gt; _preProcessors;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">RequestPreProcessorBehavior</span>(<span class="hljs-params">IEnumerable&lt;IRequestPreProcessor&lt;TRequest&gt;&gt; preProcessors</span>)</span><br>    &#123;<br>        _preProcessors = preProcessors;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">async</span> Task&lt;TResponse&gt; <span class="hljs-title">Handle</span>(<span class="hljs-params">TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate&lt;TResponse&gt; next</span>)</span><br>    &#123;<br>        <span class="hljs-keyword">foreach</span> (<span class="hljs-keyword">var</span> processor <span class="hljs-keyword">in</span> _preProcessors)<br>        &#123;<br>            <span class="hljs-keyword">await</span> processor.Process(request, cancellationToken).ConfigureAwait(<span class="hljs-literal">false</span>);<br>        &#125;<br><br>        <span class="hljs-keyword">return</span> <span class="hljs-keyword">await</span> next().ConfigureAwait(<span class="hljs-literal">false</span>);<br>    &#125;<br>&#125;<br><br><span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;summary&gt;</span></span><br><span class="hljs-comment"><span class="hljs-doctag">///</span> Behavior for executing all <span class="hljs-doctag">&lt;see cref=&quot;IRequestPostProcessor&#123;TRequest,TResponse&#125;&quot;/&gt;</span> instances after handling the request</span><br><span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;/summary&gt;</span></span><br><span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;typeparam name=&quot;TRequest&quot;&gt;</span>Request type<span class="hljs-doctag">&lt;/typeparam&gt;</span></span><br><span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;typeparam name=&quot;TResponse&quot;&gt;</span>Response type<span class="hljs-doctag">&lt;/typeparam&gt;</span></span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">RequestPostProcessorBehavior</span>&lt;<span class="hljs-title">TRequest</span>, <span class="hljs-title">TResponse</span>&gt; : <span class="hljs-title">IPipelineBehavior</span>&lt;<span class="hljs-title">TRequest</span>, <span class="hljs-title">TResponse</span>&gt;<br>    <span class="hljs-keyword">where</span> <span class="hljs-title">TRequest</span> : <span class="hljs-title">notnull</span><br>&#123;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">readonly</span> IEnumerable&lt;IRequestPostProcessor&lt;TRequest, TResponse&gt;&gt; _postProcessors;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">RequestPostProcessorBehavior</span>(<span class="hljs-params">IEnumerable&lt;IRequestPostProcessor&lt;TRequest, TResponse&gt;&gt; postProcessors</span>)</span><br>    &#123;<br>        _postProcessors = postProcessors;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">async</span> Task&lt;TResponse&gt; <span class="hljs-title">Handle</span>(<span class="hljs-params">TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate&lt;TResponse&gt; next</span>)</span><br>    &#123;<br>        <span class="hljs-keyword">var</span> response = <span class="hljs-keyword">await</span> next().ConfigureAwait(<span class="hljs-literal">false</span>);<br><br>        <span class="hljs-keyword">foreach</span> (<span class="hljs-keyword">var</span> processor <span class="hljs-keyword">in</span> _postProcessors)<br>        &#123;<br>            <span class="hljs-keyword">await</span> processor.Process(request, response, cancellationToken).ConfigureAwait(<span class="hljs-literal">false</span>);<br>        &#125;<br><br>        <span class="hljs-keyword">return</span> response;<br>    &#125;<br>&#125;<br><br></code></pre></td></tr></table></figure>
+<p>这两个类主要是供大家在项目中使用的时候去继承的，一个是用于请求前处理消息，一个是用于请求后处理消息。不过大家也可以直接去继承IPipelineBehavior接口去实现我们自己的逻辑。<br></p>
+<p>话到这里有个问题，我们如何保证其调用的先后顺序呢？我们还是先放放，继续向下<br></p>
+<h3 id="2-3、核心功能实现："><a href="#2-3、核心功能实现：" class="headerlink" title="2.3、核心功能实现："></a>2.3、核心功能实现：</h3><p>&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; 在此之前我们把必要的接口都过了一遍了，而他们那么多全都是为了实现一个功能，消息的发送与通知。</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><code class="hljs csharp"><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">interface</span> <span class="hljs-title">IMediator</span><br>    &#123;<br>        <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;summary&gt;</span></span><br>        <span class="hljs-comment"><span class="hljs-doctag">///</span> Asynchronously send a request to a single handler</span><br>        <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;/summary&gt;</span></span><br>        <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;typeparam name=&quot;TResponse&quot;&gt;</span>Response type<span class="hljs-doctag">&lt;/typeparam&gt;</span></span><br>        <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;param name=&quot;request&quot;&gt;</span>Request object<span class="hljs-doctag">&lt;/param&gt;</span></span><br>        <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;param name=&quot;cancellationToken&quot;&gt;</span>Optional cancellation token<span class="hljs-doctag">&lt;/param&gt;</span></span><br>        <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;returns&gt;</span>A task that represents the send operation. The task result contains the handler response<span class="hljs-doctag">&lt;/returns&gt;</span></span><br>        <span class="hljs-function"><span class="hljs-title">Task</span>&lt;<span class="hljs-title">TResponse</span>&gt; <span class="hljs-title">Send</span>&lt;<span class="hljs-title">TResponse</span>&gt;(<span class="hljs-params">IRequest&lt;TResponse&gt; request, CancellationToken cancellationToken = <span class="hljs-literal">default</span></span>)</span>;<br><br>        <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;summary&gt;</span></span><br>        <span class="hljs-comment"><span class="hljs-doctag">///</span> Asynchronously send an object request to a single handler via dynamic dispatch</span><br>        <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;/summary&gt;</span></span><br>        <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;param name=&quot;request&quot;&gt;</span>Request object<span class="hljs-doctag">&lt;/param&gt;</span></span><br>        <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;param name=&quot;cancellationToken&quot;&gt;</span>Optional cancellation token<span class="hljs-doctag">&lt;/param&gt;</span></span><br>        <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;returns&gt;</span>A task that represents the send operation. The task result contains the type erased handler response<span class="hljs-doctag">&lt;/returns&gt;</span></span><br>        Task&lt;<span class="hljs-built_in">object</span>?&gt; Send(<span class="hljs-built_in">object</span> request, CancellationToken cancellationToken = <span class="hljs-literal">default</span>);<br><br>        <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;summary&gt;</span></span><br>        <span class="hljs-comment"><span class="hljs-doctag">///</span> Asynchronously send a notification to multiple handlers</span><br>        <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;/summary&gt;</span></span><br>        <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;param name=&quot;notification&quot;&gt;</span>Notification object<span class="hljs-doctag">&lt;/param&gt;</span></span><br>        <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;param name=&quot;cancellationToken&quot;&gt;</span>Optional cancellation token<span class="hljs-doctag">&lt;/param&gt;</span></span><br>        <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;returns&gt;</span>A task that represents the publish operation.<span class="hljs-doctag">&lt;/returns&gt;</span></span><br>        <span class="hljs-function">Task <span class="hljs-title">Publish</span>(<span class="hljs-params"><span class="hljs-built_in">object</span> notification, CancellationToken cancellationToken = <span class="hljs-literal">default</span></span>)</span>;<br><br>        <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;summary&gt;</span></span><br>        <span class="hljs-comment"><span class="hljs-doctag">///</span> Asynchronously send a notification to multiple handlers</span><br>        <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;/summary&gt;</span></span><br>        <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;param name=&quot;notification&quot;&gt;</span>Notification object<span class="hljs-doctag">&lt;/param&gt;</span></span><br>        <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;param name=&quot;cancellationToken&quot;&gt;</span>Optional cancellation token<span class="hljs-doctag">&lt;/param&gt;</span></span><br>        <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;returns&gt;</span>A task that represents the publish operation.<span class="hljs-doctag">&lt;/returns&gt;</span></span><br>        <span class="hljs-function">Task <span class="hljs-title">Publish</span>&lt;<span class="hljs-title">TNotification</span>&gt;(<span class="hljs-params">TNotification notification, CancellationToken cancellationToken = <span class="hljs-literal">default</span></span>)</span><br><span class="hljs-function">            <span class="hljs-keyword">where</span> TNotification : INotification</span>;<br>    &#125;<br><br></code></pre></td></tr></table></figure>
+
+<p>&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;上面的接口，就是整个项目最核心的接口，IMediator接口，很明确的表自己的作用，以及地位，接口里面包含四个方法:</p>
+<ul>
+<li>Send&lt;TResponse&gt;() &#x2F;&#x2F;异步发送一个请求到单个处理程序</li>
+<li>Send()  &#x2F;&#x2F;异步发送一个动态调用类型的请求到单个处理程序</li>
+<li>Publish（）  &#x2F;&#x2F;异步发送动态调用类型的请求到多个处理程序，并且不需要返回值（多个也没法给返回值）</li>
+<li>Publish&lt;TNotification&gt;()  &#x2F;&#x2F;异步发送泛型的请求到多个处理程序，并且不需要返回值（多个也没法给返回值）<br></li>
+</ul>
+<p>&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;这四个方法就是撑起我们整个类库的核心功能，就是消息传递，并且支持同步及异步的方式进行请求。<br><br>在项目的源码中，还有已经实现的MediatR类，但是开发者可以根据自己的业务以及自己的水平，自己去写一个继承接口的实现类，并且实现功能，在这里呢，我们先看人家是怎么写的。</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br></pre></td><td class="code"><pre><code class="hljs csharp"><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">Mediator</span> : <span class="hljs-title">IMediator</span><br>&#123;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">readonly</span> ServiceFactory _serviceFactory;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">readonly</span> ConcurrentDictionary&lt;Type, <span class="hljs-built_in">object</span>&gt; _requestHandlers = <span class="hljs-keyword">new</span> ConcurrentDictionary&lt;Type, <span class="hljs-built_in">object</span>&gt;();<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">readonly</span> ConcurrentDictionary&lt;Type, NotificationHandlerWrapper&gt; _notificationHandlers = <span class="hljs-keyword">new</span> ConcurrentDictionary&lt;Type, NotificationHandlerWrapper&gt;();<br><br>    <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;summary&gt;</span></span><br>    <span class="hljs-comment"><span class="hljs-doctag">///</span> Initializes a new instance of the <span class="hljs-doctag">&lt;see cref=&quot;Mediator&quot;/&gt;</span> class.</span><br>    <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;/summary&gt;</span></span><br>    <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;param name=&quot;serviceFactory&quot;&gt;</span>The single instance factory.<span class="hljs-doctag">&lt;/param&gt;</span></span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">Mediator</span>(<span class="hljs-params">ServiceFactory serviceFactory</span>)</span><br>    &#123;<br>        _serviceFactory = serviceFactory;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">Task</span>&lt;<span class="hljs-title">TResponse</span>&gt; <span class="hljs-title">Send</span>&lt;<span class="hljs-title">TResponse</span>&gt;(<span class="hljs-params">IRequest&lt;TResponse&gt; request, CancellationToken cancellationToken = <span class="hljs-literal">default</span></span>)</span><br>    &#123;<br>        <span class="hljs-keyword">if</span> (request == <span class="hljs-literal">null</span>)<br>        &#123;<br>            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> ArgumentNullException(<span class="hljs-keyword">nameof</span>(request));<br>        &#125;<br><br>        <span class="hljs-keyword">var</span> requestType = request.GetType();<br><br>        <span class="hljs-keyword">var</span> handler = (RequestHandlerWrapper&lt;TResponse&gt;)_requestHandlers.GetOrAdd(requestType,<br>            t =&gt; Activator.CreateInstance(<span class="hljs-keyword">typeof</span>(RequestHandlerWrapperImpl&lt;,&gt;).MakeGenericType(requestType, <span class="hljs-keyword">typeof</span>(TResponse))));<br><br>        <span class="hljs-keyword">return</span> handler.Handle(request, cancellationToken, _serviceFactory);<br>    &#125;<br><br>    <span class="hljs-keyword">public</span> Task&lt;<span class="hljs-built_in">object</span>?&gt; Send(<span class="hljs-built_in">object</span> request, CancellationToken cancellationToken = <span class="hljs-literal">default</span>)<br>    &#123;<br>        <span class="hljs-keyword">if</span> (request == <span class="hljs-literal">null</span>)<br>        &#123;<br>            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> ArgumentNullException(<span class="hljs-keyword">nameof</span>(request));<br>        &#125;<br>        <span class="hljs-keyword">var</span> requestType = request.GetType();<br>        <span class="hljs-keyword">var</span> requestInterfaceType = requestType<br>            .GetInterfaces()<br>            .FirstOrDefault(i =&gt; i.IsGenericType &amp;&amp; i.GetGenericTypeDefinition() == <span class="hljs-keyword">typeof</span>(IRequest&lt;&gt;));<br>        <span class="hljs-keyword">var</span> isValidRequest = requestInterfaceType != <span class="hljs-literal">null</span>;<br><br>        <span class="hljs-keyword">if</span> (!isValidRequest)<br>        &#123;<br>            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> ArgumentException(<span class="hljs-string">$&quot;<span class="hljs-subst">&#123;<span class="hljs-keyword">nameof</span>(request)&#125;</span> does not implement $<span class="hljs-subst">&#123;<span class="hljs-keyword">nameof</span>(IRequest)&#125;</span>&quot;</span>);<br>        &#125;<br><br>        <span class="hljs-keyword">var</span> responseType = requestInterfaceType!.GetGenericArguments()[<span class="hljs-number">0</span>];<br>        <span class="hljs-keyword">var</span> handler = _requestHandlers.GetOrAdd(requestType,<br>            t =&gt; Activator.CreateInstance(<span class="hljs-keyword">typeof</span>(RequestHandlerWrapperImpl&lt;,&gt;).MakeGenericType(requestType, responseType)));<br><br>        <span class="hljs-comment">// call via dynamic dispatch to avoid calling through reflection for performance reasons</span><br>        <span class="hljs-keyword">return</span> ((RequestHandlerBase) handler).Handle(request, cancellationToken, _serviceFactory);<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> Task <span class="hljs-title">Publish</span>&lt;<span class="hljs-title">TNotification</span>&gt;(<span class="hljs-params">TNotification notification, CancellationToken cancellationToken = <span class="hljs-literal">default</span></span>) <span class="hljs-keyword">where</span> TNotification : INotification</span><br>    &#123;<br>        <span class="hljs-keyword">if</span> (notification == <span class="hljs-literal">null</span>)<br>        &#123;<br>            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> ArgumentNullException(<span class="hljs-keyword">nameof</span>(notification));<br>        &#125;<br><br>        <span class="hljs-keyword">return</span> PublishNotification(notification, cancellationToken);<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> Task <span class="hljs-title">Publish</span>(<span class="hljs-params"><span class="hljs-built_in">object</span> notification, CancellationToken cancellationToken = <span class="hljs-literal">default</span></span>)</span><br>    &#123;<br>        <span class="hljs-keyword">if</span> (notification == <span class="hljs-literal">null</span>)<br>        &#123;<br>            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> ArgumentNullException(<span class="hljs-keyword">nameof</span>(notification));<br>        &#125;<br>        <span class="hljs-keyword">if</span> (notification <span class="hljs-keyword">is</span> INotification instance)<br>        &#123;<br>            <span class="hljs-keyword">return</span> PublishNotification(instance, cancellationToken);<br>        &#125;<br><br>        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> ArgumentException(<span class="hljs-string">$&quot;<span class="hljs-subst">&#123;<span class="hljs-keyword">nameof</span>(notification)&#125;</span> does not implement $<span class="hljs-subst">&#123;<span class="hljs-keyword">nameof</span>(INotification)&#125;</span>&quot;</span>);<br>    &#125;<br><br>    <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;summary&gt;</span></span><br>    <span class="hljs-comment"><span class="hljs-doctag">///</span> Override in a derived class to control how the tasks are awaited. By default the implementation is a foreach and await of each handler</span><br>    <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;/summary&gt;</span></span><br>    <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;param name=&quot;allHandlers&quot;&gt;</span>Enumerable of tasks representing invoking each notification handler<span class="hljs-doctag">&lt;/param&gt;</span></span><br>    <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;param name=&quot;notification&quot;&gt;</span>The notification being published<span class="hljs-doctag">&lt;/param&gt;</span></span><br>    <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;param name=&quot;cancellationToken&quot;&gt;</span>The cancellation token<span class="hljs-doctag">&lt;/param&gt;</span></span><br>    <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;returns&gt;</span>A task representing invoking all handlers<span class="hljs-doctag">&lt;/returns&gt;</span></span><br>    <span class="hljs-function"><span class="hljs-keyword">protected</span> <span class="hljs-keyword">virtual</span> <span class="hljs-keyword">async</span> Task <span class="hljs-title">PublishCore</span>(<span class="hljs-params">IEnumerable&lt;Func&lt;INotification, CancellationToken, Task&gt;&gt; allHandlers, INotification notification, CancellationToken cancellationToken</span>)</span><br>    &#123;<br>        <span class="hljs-keyword">foreach</span> (<span class="hljs-keyword">var</span> handler <span class="hljs-keyword">in</span> allHandlers)<br>        &#123;<br>            <span class="hljs-keyword">await</span> handler(notification, cancellationToken).ConfigureAwait(<span class="hljs-literal">false</span>);<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">private</span> Task <span class="hljs-title">PublishNotification</span>(<span class="hljs-params">INotification notification, CancellationToken cancellationToken = <span class="hljs-literal">default</span></span>)</span><br>    &#123;<br>        <span class="hljs-keyword">var</span> notificationType = notification.GetType();<br>        <span class="hljs-keyword">var</span> handler = _notificationHandlers.GetOrAdd(notificationType,<br>            t =&gt; (NotificationHandlerWrapper)Activator.CreateInstance(<span class="hljs-keyword">typeof</span>(NotificationHandlerWrapperImpl&lt;&gt;).MakeGenericType(notificationType)));<br><br>        <span class="hljs-keyword">return</span> handler.Handle(notification, cancellationToken, _serviceFactory, PublishCore);<br>    &#125;<br>&#125;<br><br></code></pre></td></tr></table></figure>
+
+<p>&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;我们注意到，在类的构造函数中，它注入了一个ServiceFactory，这个ServiceFactory是个什么东西，我们来看一下</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs csharp"><br><span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;summary&gt;</span></span><br><span class="hljs-comment"><span class="hljs-doctag">///</span> Factory method used to resolve all services. For multiple instances, it will resolve against <span class="hljs-doctag">&lt;see cref=&quot;IEnumerable&#123;T&#125;&quot; /&gt;</span></span><br><span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;/summary&gt;</span></span><br><span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;param name=&quot;serviceType&quot;&gt;</span>Type of service to resolve<span class="hljs-doctag">&lt;/param&gt;</span></span><br><span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;returns&gt;</span>An instance of type <span class="hljs-doctag">&lt;paramref name=&quot;serviceType&quot; /&gt;</span><span class="hljs-doctag">&lt;/returns&gt;</span></span><br><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-built_in">delegate</span> <span class="hljs-built_in">object</span> <span class="hljs-title">ServiceFactory</span>(<span class="hljs-params">Type serviceType</span>)</span>;<br><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">class</span> <span class="hljs-title">ServiceFactoryExtensions</span><br>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> T <span class="hljs-title">GetInstance</span>&lt;<span class="hljs-title">T</span>&gt;(<span class="hljs-params"><span class="hljs-keyword">this</span> ServiceFactory factory</span>)</span>=&gt; (T) factory(<span class="hljs-keyword">typeof</span>(T));<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-title">IEnumerable</span>&lt;<span class="hljs-title">T</span>&gt; <span class="hljs-title">GetInstances</span>&lt;<span class="hljs-title">T</span>&gt;(<span class="hljs-params"><span class="hljs-keyword">this</span> ServiceFactory factory</span>)</span> <br>    &#123;<br>        Type type = <span class="hljs-keyword">typeof</span>(IEnumerable&lt;T&gt;);<br><br>        <span class="hljs-keyword">var</span> a = (IEnumerable&lt;T&gt;) factory.Invoke(<span class="hljs-keyword">typeof</span>(IEnumerable&lt;T&gt;));<br><br>        <span class="hljs-keyword">return</span> a;<br>    &#125; <br>&#125;<br><br></code></pre></td></tr></table></figure>
+<p>&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;ServiceFactory是干什么用的，这次我们看注释,我给翻译了一下：用于解析所有服务的工厂方法。对于多个实例，它将解析为IEnumerable，欸！这就很有意思了，他的意思是什么呢，他是一个工厂，通过IOC也就是依赖注入，当你使用的时候，指定一个类型，他将在IOC容器里面直接给你解析出一个或者多个实例出来，是不是很牛逼，反正我觉得很牛逼，当初这玩意我整整研究了一天才研究明白！搞清楚ServiceFactory的用法以后，我们开始一步步理清这个项目是如何实现功能的，首先我们从Send()开始,我们可以看到，当参数类传入进来以后，首先根据GetType方法得到了参数类型，然后通过反射实例化出了一个继承于RequestHandlerWrapperImpl&lt;,&gt;类型的实例,那么这个RequestHandlerWrapperImpl&lt;,&gt;又是干啥的呢？我们进去看一下:</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><code class="hljs csharp"><br><span class="hljs-keyword">internal</span> <span class="hljs-keyword">abstract</span> <span class="hljs-keyword">class</span> <span class="hljs-title">RequestHandlerBase</span><br>&#123;<br>        <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">abstract</span> <span class="hljs-title">Task</span>&lt;<span class="hljs-title">object</span>?&gt; <span class="hljs-title">Handle</span>(<span class="hljs-params"><span class="hljs-built_in">object</span> request, CancellationToken cancellationToken,ServiceFactory serviceFactory</span>)</span>;<br><br>        <span class="hljs-function"><span class="hljs-keyword">protected</span> <span class="hljs-keyword">static</span> THandler <span class="hljs-title">GetHandler</span>&lt;<span class="hljs-title">THandler</span>&gt;(<span class="hljs-params">ServiceFactory factory</span>)</span><br>        &#123;<br>            THandler handler;<br><br>            <span class="hljs-keyword">try</span><br>            &#123;<br>                handler = factory.GetInstance&lt;THandler&gt;();<br>            &#125;<br>            <span class="hljs-keyword">catch</span> (Exception e)<br>            &#123;<br>                <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> InvalidOperationException(<span class="hljs-string">$&quot;Error constructing handler for request of type <span class="hljs-subst">&#123;<span class="hljs-keyword">typeof</span>(THandler)&#125;</span>. Register your handlers with the container. See the samples in GitHub for examples.&quot;</span>, e);<br>            &#125;<br><br>            <span class="hljs-keyword">if</span> (handler == <span class="hljs-literal">null</span>)<br>            &#123;<br>                <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> InvalidOperationException(<span class="hljs-string">$&quot;Handler was not found for request of type <span class="hljs-subst">&#123;<span class="hljs-keyword">typeof</span>(THandler)&#125;</span>. Register your handlers with the container. See the samples in GitHub for examples.&quot;</span>);<br>            &#125;<br><br>            <span class="hljs-keyword">return</span> handler;<br>        &#125;<br>&#125;<br><br> <span class="hljs-keyword">internal</span> <span class="hljs-keyword">abstract</span> <span class="hljs-keyword">class</span> <span class="hljs-title">RequestHandlerWrapper</span>&lt;<span class="hljs-title">TResponse</span>&gt; : <span class="hljs-title">RequestHandlerBase</span><br> &#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">abstract</span> Task&lt;TResponse&gt; <span class="hljs-title">Handle</span>(<span class="hljs-params">IRequest&lt;TResponse&gt; request, CancellationToken cancellationToken,ServiceFactory serviceFactory</span>)</span>;<br> &#125;<br> <br><span class="hljs-keyword">internal</span> <span class="hljs-keyword">class</span> <span class="hljs-title">RequestHandlerWrapperImpl</span>&lt;<span class="hljs-title">TRequest</span>, <span class="hljs-title">TResponse</span>&gt; : <span class="hljs-title">RequestHandlerWrapper</span>&lt;<span class="hljs-title">TResponse</span>&gt; <span class="hljs-keyword">where</span> <span class="hljs-title">TRequest</span> : <span class="hljs-title">IRequest</span>&lt;<span class="hljs-title">TResponse</span>&gt;<br>&#123;<br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">override</span> Task&lt;<span class="hljs-built_in">object</span>?&gt; Handle(<span class="hljs-built_in">object</span> request, CancellationToken cancellationToken, ServiceFactory serviceFactory)<br>    &#123;<br>            <span class="hljs-keyword">return</span> Handle((IRequest&lt;TResponse&gt;)request, cancellationToken, serviceFactory).ContinueWith(t =&gt;<br>            &#123;<br>                <span class="hljs-keyword">if</span> (t.IsFaulted)<br>                &#123;<br>                    ExceptionDispatchInfo.Capture(t.Exception.InnerException).Throw();<br>                &#125;<br>                    <span class="hljs-keyword">return</span> (<span class="hljs-built_in">object</span>?)t.Result;<br>            &#125;, cancellationToken);<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">override</span> Task&lt;TResponse&gt; <span class="hljs-title">Handle</span>(<span class="hljs-params">IRequest&lt;TResponse&gt; request, CancellationToken cancellationToken,ServiceFactory serviceFactory</span>)</span><br>    &#123;<br>            <span class="hljs-function">Task&lt;TResponse&gt; <span class="hljs-title">Handler</span>()</span> =&gt; GetHandler&lt;IRequestHandler&lt;TRequest, TResponse&gt;&gt;(serviceFactory).Handle((TRequest) request, cancellationToken);<br><br>            <span class="hljs-keyword">return</span> serviceFactory<br>                   .GetInstances&lt;IPipelineBehavior&lt;TRequest, TResponse&gt;&gt;()<br>                   .Reverse()<br>                   .Aggregate((RequestHandlerDelegate&lt;TResponse&gt;) Handler, (next, pipeline) =&gt; () =&gt; pipeline.Handle((TRequest)request, cancellationToken, next))();<br>    &#125;<br>&#125;<br><br></code></pre></td></tr></table></figure>
+<p>&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;又是个典型的包装器模式，话不多说直接看实现，我们可以看到RequestHandlerWrapperImpl&lt;,&gt;类继承于RequestHandlerWrapper&lt;TRespose&gt;类，是包装器的实现类,其中类里面包含一个Handle方法,将参数以及ServiceFactory传入进来以后首先解析出继承管道的所有类,欸！！！这个时候我们回顾一下我们的问题，管道的执行顺序，嘿嘿最骚的来了,<br>我们看他下面的Reverse()这个方法，是将IEnumerable类型的元素反过来排序,这个时候你就问了，这跟顺序有啥关系？我来告诉你！！NetCore的IOC容器，不管是内置的还是AutoFac，进行注册的时候，服务进入容器的顺序就像压栈一样，先进的被压在下面，后进的在上面，调用顺序也是先进后出的顺序。所以当我们根据依赖注入反射出所有管道实现类以后，反转排序一下，是不是就跟你注册时候写的顺序一毛一样了？？？这个时候下面的Aggregate()方法，就会按照管道顺序，一个一个的执行，可以看到在Aggregate()方法，还传入了一个请求处理的委托类型Handler,这个委托类型就是管道最后所执行的我们传入的参数的处理类型，看一下Haddler的实现方法,首先是通过GetHandler&lt;THandler&gt;()方法(这个方法在RequestHandlerBase那个抽象类里面,不记得的往上翻)通过IOC获取出对应的实例出来，然后调用实例的Handle()方法进行处理。一对一消息传递的所有的流程全部走完，还有人问通知模式下如何实现的？来我告诉你。。。看源码:</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><code class="hljs csharp"><br><span class="hljs-keyword">internal</span> <span class="hljs-keyword">abstract</span> <span class="hljs-keyword">class</span> <span class="hljs-title">NotificationHandlerWrapper</span><br>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">abstract</span> Task <span class="hljs-title">Handle</span>(<span class="hljs-params">INotification notification, CancellationToken cancellationToken, ServiceFactory serviceFactory,Func&lt;IEnumerable&lt;Func&lt;INotification, CancellationToken, Task&gt;&gt;, INotification, CancellationToken, Task&gt; publish</span>)</span>;<br>&#125;<br><br><span class="hljs-keyword">internal</span> <span class="hljs-keyword">class</span> <span class="hljs-title">NotificationHandlerWrapperImpl</span>&lt;<span class="hljs-title">TNotification</span>&gt; : <span class="hljs-title">NotificationHandlerWrapper</span> <span class="hljs-keyword">where</span> <span class="hljs-title">TNotification</span> : <span class="hljs-title">INotification</span><br>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">override</span> Task <span class="hljs-title">Handle</span>(<span class="hljs-params">INotification notification, CancellationToken cancellationToken, ServiceFactory serviceFactory,Func&lt;IEnumerable&lt;Func&lt;INotification, CancellationToken, Task&gt;&gt;, INotification, CancellationToken, Task&gt; publish</span>)</span><br>    &#123;<br>        <span class="hljs-keyword">var</span> handlers = serviceFactory.GetInstances&lt;INotificationHandler&lt;TNotification&gt;&gt;()<br>                                     .Select(x =&gt; <span class="hljs-keyword">new</span> Func&lt;INotification, CancellationToken, Task&gt;((theNotification, theToken) =&gt; x.Handle((TNotification)theNotification, theToken)));<br><br>        <span class="hljs-keyword">return</span> publish(handlers, notification, cancellationToken);<br>    &#125;<br>&#125;<br><br>    <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;summary&gt;</span></span><br>    <span class="hljs-comment"><span class="hljs-doctag">///</span> Override in a derived class to control how the tasks are awaited. By default the implementation is a foreach and await of each handler</span><br>    <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;/summary&gt;</span></span><br>    <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;param name=&quot;allHandlers&quot;&gt;</span>Enumerable of tasks representing invoking each notification handler<span class="hljs-doctag">&lt;/param&gt;</span></span><br>    <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;param name=&quot;notification&quot;&gt;</span>The notification being published<span class="hljs-doctag">&lt;/param&gt;</span></span><br>    <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;param name=&quot;cancellationToken&quot;&gt;</span>The cancellation token<span class="hljs-doctag">&lt;/param&gt;</span></span><br>    <span class="hljs-comment"><span class="hljs-doctag">///</span> <span class="hljs-doctag">&lt;returns&gt;</span>A task representing invoking all handlers<span class="hljs-doctag">&lt;/returns&gt;</span></span><br>    <span class="hljs-function"><span class="hljs-keyword">protected</span> <span class="hljs-keyword">virtual</span> <span class="hljs-keyword">async</span> Task <span class="hljs-title">PublishCore</span>(<span class="hljs-params">IEnumerable&lt;Func&lt;INotification, CancellationToken, Task&gt;&gt; allHandlers, INotification notification, CancellationToken cancellationToken</span>)</span><br>    &#123;<br>        <span class="hljs-keyword">foreach</span> (<span class="hljs-keyword">var</span> handler <span class="hljs-keyword">in</span> allHandlers)<br>        &#123;<br>            <span class="hljs-keyword">await</span> handler(notification, cancellationToken).ConfigureAwait(<span class="hljs-literal">false</span>);<br>        &#125;<br>    &#125;<br><br><br><br></code></pre></td></tr></table></figure>
+
+<p>&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;看到了吧，除了没有走管道，几乎一模一样,除了最后用了个publish();这个publish()就是将查出来的实现类循环执行一遍。。没了！！</p>
+<p>&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;好了，至此整个项目完全梳理完了，估计仔仔细细看一遍，不说能帮你完全了解吧，咋说也能在你看源码的时候帮你一点。。。</p>
+<p><img src="https://img-blog.csdnimg.cn/20200715192157204.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0NBUEZfc2t5,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/20200715192244487.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0NBUEZfc2t5,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" lazyload alt="在这里插入图片描述"></p>
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E4%BA%8B%E4%BB%B6%E6%80%BB%E7%BA%BF/" class="category-chain-item">事件总线</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/MediatR/">#MediatR</a>
+      
+        <a href="/tags/EventBus/">#EventBus</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>MediatR源码详解</div>
+      <div>http://blog.renzhichu.top/2021/08/23/事件总线/MediatR源码详解/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>多拉多拉曼</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2021年8月23日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/03/22/Redis/%E7%89%9B%E7%89%9B%E7%9A%84Redis%E7%9A%84%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E7%AC%AC%E4%B8%80%E7%AB%A0/" title="牛牛的Redis的学习笔记--第一章">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">牛牛的Redis的学习笔记--第一章</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2021/08/23/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/Rabbitmq%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" title="Rabbitmq学习笔记">
+                        <span class="hidden-mobile">Rabbitmq学习笔记</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/tocbot@4.12.3/dist/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/clipboard@2.0.8/dist/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/anchor-js@4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

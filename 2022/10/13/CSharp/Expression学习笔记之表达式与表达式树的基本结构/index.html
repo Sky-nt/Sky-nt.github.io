@@ -1,0 +1,696 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" href="/img/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="多拉多拉曼">
+  <meta name="keywords" content="Asp.Net .NetCore .Net C#">
+  
+    <meta name="description" content="一个美丽的邂逅昨天心血来潮，想着用了很久的HangFire这个任务调度组件，却从来没有研究过其源码，所以我就想着看一下Hangfire的源码，然后当我看到Hangfire源码中 AspNetShutdownDetector(Asp.Net服务停止检测器)这个类的源码的时候，看到其实现方式中，有两个私有的方法，看起名称是用于创建或者获取某个类中的静态字段和非静态字段的，但是看其实现则是通过表达式树进">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Expression学习笔记之表达式与表达式树的基本结构">
+<meta property="og:url" content="http://blog.renzhichu.top/2022/10/13/CSharp/Expression%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%B9%8B%E8%A1%A8%E8%BE%BE%E5%BC%8F%E4%B8%8E%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%A0%91%E7%9A%84%E5%9F%BA%E6%9C%AC%E7%BB%93%E6%9E%84/index.html">
+<meta property="og:site_name" content="多拉多拉曼的博客">
+<meta property="og:description" content="一个美丽的邂逅昨天心血来潮，想着用了很久的HangFire这个任务调度组件，却从来没有研究过其源码，所以我就想着看一下Hangfire的源码，然后当我看到Hangfire源码中 AspNetShutdownDetector(Asp.Net服务停止检测器)这个类的源码的时候，看到其实现方式中，有两个私有的方法，看起名称是用于创建或者获取某个类中的静态字段和非静态字段的，但是看其实现则是通过表达式树进">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blog.renzhichu.top/1666099934017.jpg">
+<meta property="og:image" content="https://blog.renzhichu.top/1666104724435.jpg">
+<meta property="article:published_time" content="2022-10-13T09:37:54.000Z">
+<meta property="article:modified_time" content="2022-10-20T09:20:23.837Z">
+<meta property="article:author" content="多拉多拉曼">
+<meta property="article:tag" content="AspNet">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://blog.renzhichu.top/1666099934017.jpg">
+  
+  
+  
+  <title>Expression学习笔记之表达式与表达式树的基本结构 - 多拉多拉曼的博客</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"blog.renzhichu.top","root":"/","version":"1.9.1","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>多拉多拉曼</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Expression学习笔记之表达式与表达式树的基本结构"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-10-13 17:37" pubdate>
+          2022年10月13日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          <!-- compatible with older versions-->
+          4.1k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          <!-- compatible with older versions-->
+          35 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Expression学习笔记之表达式与表达式树的基本结构</h1>
+            
+            <div class="markdown-body">
+              
+              <h2 id="一个美丽的邂逅"><a href="#一个美丽的邂逅" class="headerlink" title="一个美丽的邂逅"></a>一个美丽的邂逅</h2><p>昨天心血来潮，想着用了很久的HangFire这个任务调度组件，却从来没有研究过其源码，所以我就想着看一下Hangfire的源码，然后当我看到Hangfire源码中 AspNetShutdownDetector(Asp.Net服务停止检测器)这个类的源码的时候，看到其实现方式中，有两个私有的方法，看起名称是用于创建或者获取某个类中的静态字段和非静态字段的，但是看其实现则是通过表达式树进行反射查找。代码如下：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs csharp"><br><span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-title">Func</span>&lt;<span class="hljs-title">T</span>&gt; <span class="hljs-title">CreateGetStaticFieldDelegate</span>&lt;<span class="hljs-title">T</span>&gt;(<span class="hljs-params">FieldInfo fieldInfo</span>)</span><br>&#123;<br>    <span class="hljs-keyword">var</span> fieldExp = Expression.Field(<span class="hljs-literal">null</span>, fieldInfo);<br>    <span class="hljs-keyword">return</span> Expression.Lambda&lt;Func&lt;T&gt;&gt;(fieldExp).Compile();<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-title">Func</span>&lt;<span class="hljs-title">object</span>, <span class="hljs-title">T</span>&gt; <span class="hljs-title">CreateGetFieldDelegate</span>&lt;<span class="hljs-title">T</span>&gt;(<span class="hljs-params">FieldInfo fieldInfo, Type type</span>)</span><br>&#123;<br>    <span class="hljs-keyword">var</span> instExp = Expression.Parameter(<span class="hljs-keyword">typeof</span>(<span class="hljs-built_in">object</span>));<br>    <span class="hljs-keyword">var</span> convExp = Expression.Convert(instExp, type);<br>    <span class="hljs-keyword">var</span> fieldExp = Expression.Field(convExp, fieldInfo);<br>    <span class="hljs-keyword">return</span> Expression.Lambda&lt;Func&lt;<span class="hljs-built_in">object</span>, T&gt;&gt;(fieldExp, instExp).Compile();<br>&#125;<br><br></code></pre></td></tr></table></figure>
+
+<p>事情突然就变得有趣起来了，因为本人是个小菜鸡，日常来说只会通过Expression来进行数据库条件查询这种基础操作，还真没有考虑过更深层次的操作，但是，人菜瘾大，又菜又爱研究，所以一下就被这个操作给吸引住了，然后越看越感兴趣，之前居然没想到表达式树居然还能进行反射操作，所以二话不说就抛弃了Hangfire的源码（毕竟得先搞懂这种操作的实现原理才能明白人家写这个用意嘛）开始专心研究起表达式树来了。</p>
+<h2 id="初识Expression"><a href="#初识Expression" class="headerlink" title="初识Expression"></a>初识Expression</h2><p>首先，我选择先来了解一下Expression的概念及相关的方法（说实话以前真没有认真研究过，实在是惭愧）, 而了解这个玩意的最好地方就是微软官方给出的<a target="_blank" rel="noopener" href="https://https//learn.microsoft.com/zh-cn/dotnet/api/system.linq.expressions.expression?view=net-6.0">文档</a>，文档原文：Expression是一个抽象类，他主要是表示表达式树节点的类派生的基类。而其派生的类如下:</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><code class="hljs csharp"><span class="hljs-comment">//表示具有二进制运算符的表达式</span><br>System.Linq.Expressions.BinaryExpression <br><span class="hljs-comment">//表示包含一个表达式序列的块，表达式中可定义变量。</span><br>System.Linq.Expressions.BlockExpression<br><span class="hljs-comment">//表示具有条件运算符的表达式。</span><br>System.Linq.Expressions.ConditionalExpression <br><span class="hljs-comment">//表示具有常数值的表达式</span><br>System.Linq.Expressions.ConstantExpression <br><span class="hljs-comment">//发出或清除调试信息的序列点。 这使调试器能够在调试时突出显示正确的源代码。</span><br>System.Linq.Expressions.DebugInfoExpression <br><span class="hljs-comment">//表示一个类型或空表达式的默认值。</span><br>System.Linq.Expressions.DefaultExpression<br><span class="hljs-comment">//表示一个动态操作</span><br>System.Linq.Expressions.DynamicExpression<br><span class="hljs-comment">//表示无条件跳转。 这包括返回语句，break 和 continue 语句以及其他跳转。</span><br>System.Linq.Expressions.GotoExpression<br><span class="hljs-comment">//表示对一个属性或数组进行索引。</span><br>System.Linq.Expressions.IndexExpression<br><span class="hljs-comment">//表示一个将委托或 Lambda 表达式应用到一个自变量表达式列表的表达式。</span><br>System.Linq.Expressions.InvocationExpression <br><span class="hljs-comment">//表示一个标签，可以将该标签放置在任何 Expression 上下文中。</span><br><span class="hljs-comment">//如果已跳转到该标签，则它将获取由对应的 GotoExpression 提供的值。 </span><br><span class="hljs-comment">//否则，它接收 DefaultValue 中的值。 </span><br><span class="hljs-comment">//如果 Type 等于 System.Void，则不应提供值。</span><br>System.Linq.Expressions.LabelExpression <br><span class="hljs-comment">//介绍 lambda 表达式。 它捕获一个类似于 .NET 方法主体的代码块。</span><br>System.Linq.Expressions.LambdaExpression<br><span class="hljs-comment">//表示具有集合初始值设定项的构造函数调用。</span><br>System.Linq.Expressions.ListInitExpression<br><span class="hljs-comment">//表示无限循环。 可通过“中断”退出该循环。</span><br>System.Linq.Expressions.LoopExpression<br><span class="hljs-comment">//表示访问字段或属性。</span><br>System.Linq.Expressions.MemberExpression<br><span class="hljs-comment">//表示调用构造函数并初始化新对象的一个或多个成员。</span><br>System.Linq.Expressions.MemberInitExpression<br><span class="hljs-comment">//表示对静态方法或实例方法的调用。</span><br>System.Linq.Expressions.MethodCallExpression<br><span class="hljs-comment">//表示创建一个新数组，并可能初始化该新数组的元素。</span><br>System.Linq.Expressions.NewArrayExpression<br><span class="hljs-comment">//表示一个构造函数调用。</span><br>System.Linq.Expressions.NewExpression<br><span class="hljs-comment">//表示一个命名的参数表达式。</span><br>System.Linq.Expressions.ParameterExpression<br><span class="hljs-comment">//一个为变量提供运行时读/写权限的表达式。</span><br>System.Linq.Expressions.RuntimeVariablesExpression<br><span class="hljs-comment">//表示一个控制表达式，该表达式通过将控制传递到 SwitchCase 来处理多重选择。</span><br>System.Linq.Expressions.SwitchExpression<br><span class="hljs-comment">//表示一个 try/catch/finally/fault 块。</span><br>System.Linq.Expressions.TryExpression<br><span class="hljs-comment">//表示表达式和类型之间的操作。</span><br>System.Linq.Expressions.TypeBinaryExpression<br><span class="hljs-comment">//表示具有一元运算符的表达式。</span><br>System.Linq.Expressions.UnaryExpression<br><br></code></pre></td></tr></table></figure>
+
+<p>由上面我们可以看出，Expression作为表达式树的一个基类，其派生了许多不同的子类，根据这些子类，我们可以实现不同的逻辑（此前真是没考虑过这方面，我以为只能去当作数据库查询语句呢，真特么惭愧），那么问题随之而来，我们应该怎么去应用这些子类，或者在什么时候可以运用他们呢？不急，今天我们首先简单了解一下Expression的相关概念及结构，先把基类研究明白了，其他子类日后可以慢慢研究。</p>
+<h2 id="解析"><a href="#解析" class="headerlink" title="解析"></a>解析</h2><p>在此之前，我们先理解一下什么是表达式，表达式是由多个运算符和操作数组成，其中运算符表示要进行的操作，而操作数可以是一个变量、常量或者固定值。举例如下：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs csharp">a&gt;b;<br>a=<span class="hljs-number">1</span>;<br>a=<span class="hljs-number">100</span>;<br><span class="hljs-keyword">var</span> a=<span class="hljs-number">1</span>+<span class="hljs-number">2</span>;<br>a+b+c;<br></code></pre></td></tr></table></figure>
+
+<p>以上这些都属于表达式，从上面的代码我可以看出，表达式的结构最简单可以分为左操作数，运算符，右操作数。三个基本的元素组成。</p>
+<p>那么什么又是表达式树？官方给出的说法是：<strong>表达式树以树形数据结构表示代码，其中每一个节点都是一种表达式</strong>，这句话其实我刚开始理解起来呢，有些不太理解，但是在阅读了几篇关于表达式树的文章以后，大致有了一些理解。我的理解：<strong>表达式树就是一个可以拆分为多个子表达式的表达式所展开后的树形结构</strong>，具体如下：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs csharp">a=<span class="hljs-number">1</span>+<span class="hljs-number">2</span>;<br></code></pre></td></tr></table></figure>
+
+<p>通过前面关于表达式介绍我们可以知道，这是一个包含加法表达式的赋值表达式，我们可以把它看作是一个表达式树，那么作为一个树形结构，我们首先把这个表达式本身看作最顶层的节点（树梢）。按照表达式的基本结构，我们首先看到左操作数（a），运算符（&#x3D;），右操作符（1+2），确定好顶层节点以后，我们开始往下去展开列出表达式的子节点，首先，该左操作数只有一个变量，那么该表达式树的第一个子节点就是左操作数变量’a’,然后第二个节点就是运算符 ‘&#x3D;’，而第三个节点则是右操作数（1+2），现在我们进一步将（1+2）看做成一个加法表达式，然后我们往下继续展开寻找子节点，那么该表达式的第一个子节点就是固定值1，第二个子节点则是运算符+，第三个子节点则是固定值2。至此，所有子节点均为个操作数或运算符，无法再继续往下展开，该表达式树结构就结束了。为了更直观的展示，我画了个结构图，其结构图如下：</p>
+<p><img src="https://blog.renzhichu.top/1666099934017.jpg" srcset="/img/loading.gif" lazyload alt="1666099934017"></p>
+<br/>
+
+<p>那么，这样一个结构，我们在代码中如何使用表达式树来进行标识呢？让我们来看下图：</p>
+<p><img src="https://blog.renzhichu.top/1666104724435.jpg" srcset="/img/loading.gif" lazyload alt="表达式"></p>
+<p>由上图可以看出，我们先使用Constant方法定义出一个ConstantException类型的表达式作为左操作数，同理我们再声明出一个右操作数，之后，通过Expression提供的Add方法或者MakeBinary方法指定从需要操作的运算以及左右操作数，从而就会生成一个BinaryExpression类型的表达式，然后我们再通过Parameter方法生命出一个变量表达式，之后通过Assign（赋值表达式）将其组合起来，就又生成了一个全新的表达式，通过输出我们可以看到，其结构与我们上面的表达式结构一毛一样。所以这就是C#表达式树相关的整个结构与基本操作。</p>
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/CSharp/" class="category-chain-item">CSharp</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/AspNet/">#AspNet</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Expression学习笔记之表达式与表达式树的基本结构</div>
+      <div>http://blog.renzhichu.top/2022/10/13/CSharp/Expression学习笔记之表达式与表达式树的基本结构/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>多拉多拉曼</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2022年10月13日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/08/31/%E6%95%B0%E6%8D%AE%E5%BA%93/%E8%AE%B0%E4%B8%80%E6%AC%A1EF-Mysql%E6%89%80%E9%81%87%E5%88%B0%E7%9A%84%E4%BA%8B%E5%8A%A1%E4%B8%8D%E7%94%9F%E6%95%88%E7%9A%84%E7%9A%84%E5%9D%91/" title="记一次EF+Mysql所遇到的事务不生效的的坑">
+                        <span class="hidden-mobile">记一次EF+Mysql所遇到的事务不生效的的坑</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/tocbot@4.12.3/dist/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/clipboard@2.0.8/dist/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/anchor-js@4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

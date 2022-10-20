@@ -1,0 +1,798 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" href="/img/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="多拉多拉曼">
+  <meta name="keywords" content="Asp.Net .NetCore .Net C#">
+  
+    <meta name="description" content="牛牛的Redis的学习笔记--第一章  前言 最近闲来无事，入手了一本钱文品老师的《Redis深度历险-核心原理与应用实践》一书，于是便偶尔翻几页学习一下Redis,毕竟用了好几年了，但是一些底层的核心内容一直没有系统的了解过，借此机会也让自己对Redis有个更深得了解吧。现在把第一张的内容进行总结并且记录一下，自己也在下面使用笔记本记录了一些要点，但是笔记本总是放着放着不知道拿哪里去了，搞了在">
+<meta property="og:type" content="article">
+<meta property="og:title" content="牛牛的Redis的学习笔记--第一章">
+<meta property="og:url" content="http://blog.renzhichu.top/2022/03/22/Redis/%E7%89%9B%E7%89%9B%E7%9A%84Redis%E7%9A%84%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E7%AC%AC%E4%B8%80%E7%AB%A0/index.html">
+<meta property="og:site_name" content="多拉多拉曼的博客">
+<meta property="og:description" content="牛牛的Redis的学习笔记--第一章  前言 最近闲来无事，入手了一本钱文品老师的《Redis深度历险-核心原理与应用实践》一书，于是便偶尔翻几页学习一下Redis,毕竟用了好几年了，但是一些底层的核心内容一直没有系统的了解过，借此机会也让自己对Redis有个更深得了解吧。现在把第一张的内容进行总结并且记录一下，自己也在下面使用笔记本记录了一些要点，但是笔记本总是放着放着不知道拿哪里去了，搞了在">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-03-22T14:17:28.000Z">
+<meta property="article:modified_time" content="2022-10-17T08:03:12.061Z">
+<meta property="article:author" content="多拉多拉曼">
+<meta property="article:tag" content="Redis">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>牛牛的Redis的学习笔记--第一章 - 多拉多拉曼的博客</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"blog.renzhichu.top","root":"/","version":"1.9.1","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>多拉多拉曼</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="牛牛的Redis的学习笔记--第一章"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-03-22 22:17" pubdate>
+          2022年3月22日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          <!-- compatible with older versions-->
+          5.8k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          <!-- compatible with older versions-->
+          49 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">牛牛的Redis的学习笔记--第一章</h1>
+            
+            <div class="markdown-body">
+              
+              <H1> 牛牛的Redis的学习笔记--第一章</H1>
+
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><blockquote>
+<p>最近闲来无事，入手了一本钱文品老师的《Redis深度历险-核心原理与应用实践》一书，于是便偶尔翻几页学习一下Redis,毕竟用了好几年了，但是一些底层的核心内容一直没有系统的了解过，借此机会也让自己对Redis有个更深得了解吧。现在把第一张的内容进行总结并且记录一下，自己也在下面使用笔记本记录了一些要点，但是笔记本总是放着放着不知道拿哪里去了，搞了在不同的笔记本上东记一些西记一些，这里写个学习笔记，算是归纳整理吧，放在网上，也能跟朋友们交流下。</p>
+</blockquote>
+<H2>1、Redis的基础结构：</H2>
+Redis常用的数据结构分为：
+ <li>string(字符串)</li>
+ <li>list（列表）</li>
+ <li>hash（字典）</li>
+ <li>set（集合）</li>
+ <li>zset（有序集合）</li>
+Redis特殊的数据结构：
+ <li>HyperLogLog</li>
+ <li>BitMap（位图）</li>
+ <li>布隆过滤器</li>
+<br>
+
+ <H3> 1、string的相关知识：</H3>
+ <H4> 1.1、string的基本概念及实现</H4>
+
+<blockquote>
+<p>Redis的字符串时动态字符串，是可以修改的，Redis每次申请字符串空间的时候，是采用预分配冗余空间的方式进行分配的。<br> 其内部字符串分配的空间内存，一定是高于储存的字符串的。如果说字符串小于1M那么每次申请到的内存是储存内存的一倍，<br> 如果字符串大于1M时，那么每次申请都是以1M 进行扩容的。注意：字符串的最大空间（字符串的长度）是512M。<br> 而字符串的底部实现则是以位图实现的，字符串是由多个字符组成的，而一个字符则是由八个位（bit）组成的，<br> 所以一串字符串则是由好多个8位数组组成</p>
+</blockquote>
+<h4 id="1-2、string的相关命令"><a href="#1-2、string的相关命令" class="headerlink" title="1.2、string的相关命令"></a>1.2、string的相关命令</h4><p> string相当于键值对，支持简单的增删改查。命令一般有：</p>
+<p> <strong>单个操作：</strong></p>
+<ul>
+<li><p>set key</p>
+</li>
+<li><p>get key</p>
+</li>
+</ul>
+<p> <strong>批量操作：</strong></p>
+ <li>mset key value key value key value</li>
+
+ <li>mget key key key key</li><br>
+ <br>
+
+<figure class="highlight gams"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs gams">&gt; <span class="hljs-keyword">set</span> test 牛牛<br>OK<br>&gt; get <span class="hljs-comment">test</span><br><span class="hljs-string">&quot;牛牛&quot;</span><br>&gt; mset <span class="hljs-comment">test0</span> 牛牛 <span class="hljs-comment">test1</span> 壮壮 <span class="hljs-comment">test2</span> 瞳瞳<br>OK<br>&gt; mget <span class="hljs-comment">test test0 test1 test2</span><br>1) <span class="hljs-string">&quot;牛牛&quot;</span><br>2) <span class="hljs-string">&quot;牛牛&quot;</span><br>3) <span class="hljs-string">&quot;壮壮&quot;</span><br>4) <span class="hljs-string">&quot;瞳瞳&quot;</span><br>&gt; mget <span class="hljs-comment">test0 test1 test2</span><br>1) <span class="hljs-string">&quot;牛牛&quot;</span><br>2) <span class="hljs-string">&quot;壮壮&quot;</span><br>3) <span class="hljs-string">&quot;瞳瞳&quot;</span><br><br></code></pre></td></tr></table></figure>
+<p>设置过期时间：</p>
+<li>expire key time</li>
+<li> setex key time value</li> <br>
+
+<figure class="highlight node-repl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs node-repl"><span class="hljs-meta prompt_">&gt;</span> <span class="language-javascript">expire test <span class="hljs-number">1</span></span><br>(integer) 1<br><span class="hljs-meta prompt_">&gt;</span> <span class="language-javascript">get test</span><br>(nil)<br><span class="hljs-meta prompt_">&gt;</span> <span class="language-javascript">get test1</span><br>&quot;壮壮&quot;<br><span class="hljs-meta prompt_">&gt;</span> <span class="language-javascript">expire test1 <span class="hljs-number">1</span></span><br>(integer) 1<br><span class="hljs-meta prompt_">&gt;</span> <span class="language-javascript">get test1</span><br>(nil)<br><br></code></pre></td></tr></table></figure>
+
+<p><strong>不存在就添加,但是存在就不改变（返回0&#x2F;1来区分是否添加成功）</strong></p>
+<li>setnx key value</li>
+<br>
+
+<figure class="highlight node-repl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs node-repl"><span class="hljs-meta prompt_">&gt;</span> <span class="language-javascript">setnx test2 <span class="hljs-number">111</span></span><br>(integer) 0<br><span class="hljs-meta prompt_">&gt;</span> <span class="language-javascript">setnx test3 <span class="hljs-number">111</span></span><br>(integer) 1<br><span class="hljs-meta prompt_">&gt;</span> <span class="language-javascript">get test2</span><br>&quot;瞳瞳&quot;<br><span class="hljs-meta prompt_">&gt;</span> <span class="language-javascript">get test4</span><br>(nil)<br></code></pre></td></tr></table></figure>
+
+<H3>2、List(列表)的相关知识</H3>
+
+
+<blockquote>
+<p>Redis的列表相当于java中的LinkedList<br>(链表还是双向链表 &#x2F;&#x2F;TODO:根据之前的Demo写一篇链表的博客—20220300),<br>这意味着Redis中List的插入和删除操作是非常快的，<br>其时间复杂度位O(1),但是索引的速度确实很慢，时间负责都为O(n)。<br>Redis的列表有多种用途，<br>当他从右边进并从左边出的时候，可以看做是队列。<br>然当他左边进左边出（或者右进右出）的时候可以就可以看成是栈,<br>而list也可以当作延时队列进行来使用。在一侧添加消息，并在另一侧对消息进行轮询弹出进行处理。</p>
+</blockquote>
+ <H4>2.1、list的相关命令</H4>
+
+
+<p><strong>推进和弹出</strong></p>
+ <li>rpush key values</li>
+ <li>rpop key</li>
+ <li>lpush key values</li>
+ <li>lpop key</li>
+
+ <figure class="highlight node-repl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs node-repl"><br> &gt; rpush listtest C#<br>(integer) 1<br><span class="hljs-meta prompt_">&gt;</span> <span class="language-javascript">rpush listtest java</span><br>(integer) 2<br><span class="hljs-meta prompt_">&gt;</span> <span class="language-javascript">rpush listtest php</span><br>(integer) 3<br><span class="hljs-meta prompt_">&gt;</span> <span class="language-javascript">rpush listtest js</span><br>(integer) 4<br><span class="hljs-meta prompt_">&gt;</span> <span class="language-javascript">rpop listtest</span><br>&quot;js&quot;<br><span class="hljs-meta prompt_">&gt;</span> <span class="language-javascript">lpop listtest</span><br>&quot;C#&quot;<br><br><span class="hljs-meta prompt_">&gt;</span> <span class="language-javascript">rpush tt C# java php</span><br>(integer) 3<br><span class="hljs-meta prompt_">&gt;</span> <span class="language-javascript">rpush tt android node go python</span><br>(integer) 7<br><br>//push 可添加多个元素<br><br></code></pre></td></tr></table></figure>
+
+
+<p><strong>遍历定位</strong><br> <li>lindex key index</li><br>lindex用于对列表进行遍历定位，性能消耗随着index的数值增大而增加。</p>
+<figure class="highlight tcl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs tcl"><span class="hljs-keyword">lindex</span> listtest <span class="hljs-number">0</span><br><span class="hljs-string">&quot;java&quot;</span><br>&gt; <span class="hljs-keyword">lindex</span> listtest <span class="hljs-number">5</span><br>(nil)<br>&gt; <span class="hljs-keyword">lindex</span> listtest <span class="hljs-number">-1</span><br><span class="hljs-string">&quot;php&quot;</span><br>&gt; <span class="hljs-keyword">lindex</span> listtest <span class="hljs-number">1</span><br><span class="hljs-string">&quot;php&quot;</span><br><br>//之前的命令已将 C# 和js 弹出，所以此时列表里只存在两个元素，<br>在坐标中，<span class="hljs-number">-1</span>代表着最后一个元素。也就是最右边的元素（列表是从左到右排列）<br><br></code></pre></td></tr></table></figure>
+<p><strong>截取保留（修剪）:该命令会保留区间内的所有元素，并且删除区间外的所有元素</strong></p>
+<p><strong>返回列表元素：返回列表中指定区间内的元素，区间以偏移量 START 和 END 指定。 其中 0 表示列表的第一个元素， 1 表示列表的第二个元素，以此类推。 你也可以使用负数下标，以 -1 表示列表的最后一个元素， -2 表示列表的倒数第二个元素 如果start是0 而end是-1 则返回正向所有元素</strong></p>
+<p>&#x2F;&#x2F;返回列表元素</p>
+<li>lrange key start_index end_index</li> 
+
+<p>&#x2F;&#x2F;截取保留</p>
+<li>ltrim &nbsp; key &nbsp; start_index ;&nbsp; end_index</li>
+
+<figure class="highlight tcl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs tcl">&gt; <span class="hljs-keyword">lrange</span> tt <span class="hljs-number">0</span> <span class="hljs-number">-1</span><br><span class="hljs-number">1</span>) <span class="hljs-string">&quot;C#&quot;</span><br><span class="hljs-number">2</span>) <span class="hljs-string">&quot;java&quot;</span><br><span class="hljs-number">3</span>) <span class="hljs-string">&quot;php&quot;</span><br><span class="hljs-number">4</span>) <span class="hljs-string">&quot;android&quot;</span><br><span class="hljs-number">5</span>) <span class="hljs-string">&quot;node&quot;</span><br><span class="hljs-number">6</span>) <span class="hljs-string">&quot;go&quot;</span><br><span class="hljs-number">7</span>) <span class="hljs-string">&quot;python&quot;</span><br><br>&gt; ltrim tt <span class="hljs-number">2</span> <span class="hljs-number">5</span><br>OK<br><br>&gt; <span class="hljs-keyword">lrange</span> tt <span class="hljs-number">0</span> <span class="hljs-number">-1</span><br><span class="hljs-number">1</span>) <span class="hljs-string">&quot;php&quot;</span><br><span class="hljs-number">2</span>) <span class="hljs-string">&quot;android&quot;</span><br><span class="hljs-number">3</span>) <span class="hljs-string">&quot;node&quot;</span><br><span class="hljs-number">4</span>) <span class="hljs-string">&quot;go&quot;</span><br><br>//可以发现从第三个元素到第六个元素还存在于列表中，其他的已经被裁剪掉了<br><br></code></pre></td></tr></table></figure>
+
+<h4 id="2-2、注意："><a href="#2-2、注意：" class="headerlink" title="2.2、注意："></a>2.2、注意：</h4><blockquote>
+<p>Redis的列表并不是普通的链表，而是快速链表（quicklist），首先在元素较少的情况下，列表是使用一块连续的内存进行储存的，这个结构是ziplist(压缩列表)。它将所有的元素都彼此紧挨着一起储存。当数据量比较多的时候，则会改成quicklist进行储存，因为普通的链表需要的附加指针空间太大，会浪费时间，还会加重内存的碎片化，。所以Redis将链表和ziplist结合组成了quicklist,就是将多个ziplist使用双向指针进行串联，既能满足快速的插入删除，又不会出现太大的冗余。</p>
+</blockquote>
+<h3 id="3、hash-哈希表–字典-的相关知识"><a href="#3、hash-哈希表–字典-的相关知识" class="headerlink" title="3、hash(哈希表–字典)的相关知识"></a>3、hash(哈希表–字典)的相关知识</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">Redis的<span class="hljs-built_in">hash</span>和C<span class="hljs-comment">#的Dictionary&lt;,&gt;的结构是一毛一样的。</span><br></code></pre></td></tr></table></figure>
+
+<h4 id="3-1、hash的命令："><a href="#3-1、hash的命令：" class="headerlink" title="3.1、hash的命令："></a>3.1、hash的命令：</h4><p>设置和获取</p>
+<li>hset key hkey value</li>
+<li>hget key heky</li><br>
+
+<p>获取key下的全部数据</p>
+<li>hgetall key</li><br>
+
+<p>获取key下的二级键值对数量</p>
+<li>hlen</li><br>
+
+<p>设置二级键值对数值计数</p>
+<li>hincrby</li>
+
+
+<h3 id="4、set（集合）的相关知识"><a href="#4、set（集合）的相关知识" class="headerlink" title="4、set（集合）的相关知识"></a>4、set（集合）的相关知识</h3><figure class="highlight mathematica"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs mathematica"><span class="hljs-variable">Redis</span>的集合其实就是相当于<span class="hljs-built_in">C</span><span class="hljs-type">#</span>中的<span class="hljs-built_in">List</span><span class="hljs-operator">&lt;</span><span class="hljs-variable">T</span><span class="hljs-operator">&gt;</span>具体泛型是什么类型的，需要看具体插入的值（这里泛型仅作比如，具体的类型没啥用）。当集合的最后一个元素被移除后，结构就会被自动删除。内存则会被回收，该结构具有去重的功能，所以一边可用于储存中奖结果名单之类的作用，可以确保用户不会被抽中两次。<br></code></pre></td></tr></table></figure>
+
+<h4 id="4-1、set（集合）的命令"><a href="#4-1、set（集合）的命令" class="headerlink" title="4.1、set（集合）的命令"></a>4.1、set（集合）的命令</h4><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs xml">添加和获取元素<br><span class="hljs-tag">&lt;<span class="hljs-name">li</span>&gt;</span>sadd key values <span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">li</span>&gt;</span>smembers key<span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><br><br>判断一个元素是否存在<br><span class="hljs-tag">&lt;<span class="hljs-name">li</span>&gt;</span>sismember key value<span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><br><br>查询集合中的元素数量<br><span class="hljs-tag">&lt;<span class="hljs-name">li</span>&gt;</span>scard key<span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><br><br>随机弹出一个值<br><span class="hljs-tag">&lt;<span class="hljs-name">li</span>&gt;</span>spop key<span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="5、zset（有序集合）的相关知识"><a href="#5、zset（有序集合）的相关知识" class="headerlink" title="5、zset（有序集合）的相关知识"></a>5、zset（有序集合）的相关知识</h3><figure class="highlight gml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs gml">Redis的有序集合其实和集合的区别就是它比集合多了个<span class="hljs-variable language_">score</span>（权重概念），而集合中的元素，可以根据<span class="hljs-variable language_">score</span>的变化，进行排序，<br>其内部实现用的是一种叫做“跳跃列表”的数据结构。同样的有序集合中最后一个元素被移除的时候数据结构就会被删除，内存就会被回收，有序集合通常用于储存 粉丝列表，用value来保存用户Id,用<span class="hljs-variable language_">score</span>来记录关注时间（时间戳），也可储存学生的成绩，value储存学生的<span class="hljs-variable language_">id</span>,<span class="hljs-variable language_">score</span>储存成绩，个人猜测：微信的步数列表、附近的人，应该是用这个进行储存的。<br></code></pre></td></tr></table></figure>
+<h4 id="5-1、zset（有序集合）的命令"><a href="#5-1、zset（有序集合）的命令" class="headerlink" title="5.1、zset（有序集合）的命令"></a>5.1、zset（有序集合）的命令</h4><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><code class="hljs xml">添加和获取元素<br><span class="hljs-tag">&lt;<span class="hljs-name">li</span>&gt;</span>zadd key score values <span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span><br><br>按照权重正向排出区间内的元素<br><span class="hljs-tag">&lt;<span class="hljs-name">li</span>&gt;</span>zrange key start_index end_index<span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><br><br>按照权重逆向排出区间内的元素<br><span class="hljs-tag">&lt;<span class="hljs-name">li</span>&gt;</span>zrevrange key start_index end_index<span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><br><br>查询集合中的元素数量<br><span class="hljs-tag">&lt;<span class="hljs-name">li</span>&gt;</span>zcard key<span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><br><br>获取指定value的权重<br><span class="hljs-tag">&lt;<span class="hljs-name">li</span>&gt;</span>zscore key value<span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><br><br>获取指定value的排名<br><span class="hljs-tag">&lt;<span class="hljs-name">li</span>&gt;</span>zrank key value<span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><br><br>获取权重区间内的元素<br><span class="hljs-tag">&lt;<span class="hljs-name">li</span>&gt;</span>zrangebyscore key start_score end_score<span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><br><br>删除一个值<br><span class="hljs-tag">&lt;<span class="hljs-name">li</span>&gt;</span>zrem key<span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<h2 id="Redis的数据结构类型及其通用规则"><a href="#Redis的数据结构类型及其通用规则" class="headerlink" title="Redis的数据结构类型及其通用规则"></a>Redis的数据结构类型及其通用规则</h2><h3 id="1、容器类型数据结构"><a href="#1、容器类型数据结构" class="headerlink" title="1、容器类型数据结构"></a>1、容器类型数据结构</h3><figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs stata">在Redis中 <span class="hljs-keyword">list</span>、<span class="hljs-keyword">set</span>、hash、zset 这四种数据结构属于容器行数据结构，他们均有一下两条通用规则&lt;<span class="hljs-keyword">br</span>&gt;<br>&lt;<span class="hljs-keyword">li</span>&gt;一、如果容器不存在就创建一个，再进行操作。&lt;/<span class="hljs-keyword">li</span>&gt;<br>&lt;<span class="hljs-keyword">li</span>&gt;二、如果最后一个元素被取出或者删除了，那么容器就会消失，内存回收释放。<br></code></pre></td></tr></table></figure>
+<h2 id="Redis的过期时间"><a href="#Redis的过期时间" class="headerlink" title="Redis的过期时间"></a>Redis的过期时间</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">Redis的所有数据结构都可以设置过期时间，时间到了，Redis会自动删除相应的对象，但是过期时间是以对象为单位的，所以<span class="hljs-built_in">hash</span>并不能对某个二级key设置过期时间，还有就是如果一个字符串设置了过期时间，那么如果再次调用<span class="hljs-built_in">set</span>命令的话过期时间会消失。<br><br></code></pre></td></tr></table></figure>
+
+<h2 id="位图的应用场景及使用方式"><a href="#位图的应用场景及使用方式" class="headerlink" title="位图的应用场景及使用方式"></a>位图的应用场景及使用方式</h2><blockquote>
+<p>刚听说位图的时候，觉得这是一块很难懂的玩意，又是bit又是字符串的，但是当潜下心来了解的时候发现其实一点都不难，Redids的字符串，每个英文字母是一个字节，而一个字节是八个bit,而一个字符串就是一堆以八个bit为一组的数组，每个bit不是1就是0，也可以看作非真即假，这个时候，我们可以把这个玩意儿用于储存比如内日签到记录，或者每日登记之类的场景，因为是否签到，就是非真即假，签到了我们就存个1，没签到我们就存个0。这样一年的签到记录也就是个45个字的字符串。。。。<br>位图的命令也很简单</p>
+</blockquote>
+<ul>
+<li>setbit key offset value</li>
+<li>getbit key offset</li>
+</ul>
+<figure class="highlight node-repl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><code class="hljs node-repl"><span class="hljs-meta prompt_">&gt;</span> <span class="language-javascript">set h h</span><br>OK<br><span class="hljs-meta prompt_">&gt;</span> <span class="language-javascript">getbit h <span class="hljs-number">0</span></span><br>0<br><span class="hljs-meta prompt_">&gt;</span> <span class="language-javascript">getbit h <span class="hljs-number">1</span></span><br>1<br><span class="hljs-meta prompt_">&gt;</span> <span class="language-javascript">getbit h <span class="hljs-number">2</span></span><br>1<br><span class="hljs-meta prompt_">&gt;</span> <span class="language-javascript">getbit h <span class="hljs-number">3</span></span><br>0<br><span class="hljs-meta prompt_">&gt;</span> <span class="language-javascript">getbit h <span class="hljs-number">4</span></span><br>1<br><span class="hljs-meta prompt_">&gt;</span> <span class="language-javascript">getbit h <span class="hljs-number">5</span></span><br>0<br><span class="hljs-meta prompt_">&gt;</span> <span class="language-javascript">getbit h <span class="hljs-number">6</span></span><br>0<br><span class="hljs-meta prompt_">&gt;</span> <span class="language-javascript">getbit h <span class="hljs-number">7</span></span><br>0<br><br>// 01101000<br><br>/*<br>使用py解析下h的二进制编码<br>&gt;&gt;&gt; bin(ord(&#x27;h&#x27;))<br>&#x27;01101000&#x27;<br>&gt;&gt;&gt;<br>*/<br><br>可以发现一毛一样，不过！！<br>正常的二进制是从高位到地位的， 也就是说py解析出来的八个数字。其实是<br>76543210以这样排列，但是Redis中位图则是从低到高进行排列的。<br>所以跟正常的二进制刚好是相反的01234567<br>接下来我们可以通过位图添加出一个字符<br><br>setbit t 0 0<br>0<br><span class="hljs-meta prompt_">&gt;</span> <span class="language-javascript">setbit t <span class="hljs-number">1</span> <span class="hljs-number">1</span></span><br>0<br><span class="hljs-meta prompt_">&gt;</span> <span class="language-javascript">setbit t <span class="hljs-number">2</span> <span class="hljs-number">1</span></span><br>0<br><span class="hljs-meta prompt_">&gt;</span> <span class="language-javascript">setbit t <span class="hljs-number">3</span> <span class="hljs-number">0</span></span><br>0<br><span class="hljs-meta prompt_">&gt;</span> <span class="language-javascript">setbit t <span class="hljs-number">4</span> <span class="hljs-number">1</span></span><br>0<br><span class="hljs-meta prompt_">&gt;</span> <span class="language-javascript">setbit t <span class="hljs-number">5</span> <span class="hljs-number">0</span></span><br>0<br><span class="hljs-meta prompt_">&gt;</span> <span class="language-javascript">setbit t <span class="hljs-number">6</span> <span class="hljs-number">0</span></span><br>0<br><span class="hljs-meta prompt_">&gt;</span> <span class="language-javascript">setbit t <span class="hljs-number">7</span> <span class="hljs-number">0</span></span><br>0<br><span class="hljs-meta prompt_">&gt;</span> <span class="language-javascript">get t</span><br>&quot;h&quot;<br><br><span class="hljs-meta prompt_">&gt;</span> <span class="language-javascript">bitcount h</span><br>3<br>//上面这个命令则是统计这个Key的位图里有几个1，意味着位图如果使用到签到场景的话，可以统计整个记录里面签到多少次。如果指定了参数范围，则可以查看这个范围内的签到次数，但是注意，指定的范围，只能是8的倍数，而不能任意指定。<br><br></code></pre></td></tr></table></figure>
+
+
+<h2 id="思考："><a href="#思考：" class="headerlink" title="思考："></a>思考：</h2><p> 常用的数据存储中，我们针对一个完整的结构，是直接存储json还是分开存储属性？比如用户信息。我们是把整个用户信息进行存储还是以用户id为命名空间，下面存储各个信息的单独属性。</p>
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Redis/" class="category-chain-item">Redis</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Redis/">#Redis</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>牛牛的Redis的学习笔记--第一章</div>
+      <div>http://blog.renzhichu.top/2022/03/22/Redis/牛牛的Redis的学习笔记-第一章/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>多拉多拉曼</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2022年3月22日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/05/29/uncategorized/NetCore%E8%AE%B0%E4%B8%80%E6%AC%A1%E8%AF%A1%E5%BC%82%E7%9A%84Failed%20to%20create%20CoreCLR%20%E7%9A%84%E9%97%AE%E9%A2%98/" title="记一次netcore在linux服务器上出现的诡异的failed to create coreclr hresult:0x80004005的问题">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">记一次netcore在linux服务器上出现的诡异的failed to create coreclr hresult:0x80004005的问题</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2021/08/23/%E4%BA%8B%E4%BB%B6%E6%80%BB%E7%BA%BF/MediatR%E6%BA%90%E7%A0%81%E8%AF%A6%E8%A7%A3/" title="MediatR源码详解">
+                        <span class="hidden-mobile">MediatR源码详解</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/tocbot@4.12.3/dist/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/clipboard@2.0.8/dist/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/anchor-js@4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

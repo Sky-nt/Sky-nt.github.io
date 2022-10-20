@@ -1,0 +1,747 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" href="/img/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="多拉多拉曼">
+  <meta name="keywords" content="Asp.Net .NetCore .Net C#">
+  
+    <meta name="description" content="dotnetCore微服务API网关-Ocelot学习笔记（一、API网关介绍及Ocelot介绍和配置）零、为啥写这个&amp;ensp;&amp;ensp;&amp;ensp;&amp;ensp;说实话工作用了两年多的微服务了，自己却连工作所用的微服务API网关都没有深入的了解和学习过，只存在于会改会写的阶段，一直觉得特别惭愧，所以自己一直想深入的了解和学习一下，然后近期不是工作不是很忙，就想着">
+<meta property="og:type" content="article">
+<meta property="og:title" content="dotnetCore微服务API网关-Ocelot学习笔记（一、API网关介绍及Ocelot介绍和配置）">
+<meta property="og:url" content="http://blog.renzhichu.top/2021/07/27/%E7%BD%91%E5%85%B3/dotnetCore%E5%BE%AE%E6%9C%8D%E5%8A%A1API%E7%BD%91%E5%85%B3-Ocelot%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%B8%80%E3%80%81API%E7%BD%91%E5%85%B3%E4%BB%8B%E7%BB%8D%E5%8F%8AOcelot%E4%BB%8B%E7%BB%8D%E5%92%8C%E9%85%8D%E7%BD%AE%EF%BC%89/index.html">
+<meta property="og:site_name" content="多拉多拉曼的博客">
+<meta property="og:description" content="dotnetCore微服务API网关-Ocelot学习笔记（一、API网关介绍及Ocelot介绍和配置）零、为啥写这个&amp;ensp;&amp;ensp;&amp;ensp;&amp;ensp;说实话工作用了两年多的微服务了，自己却连工作所用的微服务API网关都没有深入的了解和学习过，只存在于会改会写的阶段，一直觉得特别惭愧，所以自己一直想深入的了解和学习一下，然后近期不是工作不是很忙，就想着">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/img_convert/1889a09b5f8c09e25b35a73e698dab6b.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/img_convert/6db04ec3103ba816332acd1675ae5ee9.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/img_convert/37f91d87c6a277816ee92e24997075d8.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/img_convert/13cd6cda98e0ddc4647d80fd8180b304.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/img_convert/ed2990ec70dd5f1e5796467d2a121fde.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/img_convert/ae8eaf99e6b00511aeac309bfa309e90.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/img_convert/38ba5cbec126c1f9522cc671aa02ec80.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/img_convert/98da378abaaa45bb5403dcb3f4d9c354.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/img_convert/eea44a1a094cee37dcab35fae6ea1d20.png">
+<meta property="article:published_time" content="2021-07-27T09:40:18.000Z">
+<meta property="article:modified_time" content="2022-10-17T08:03:12.060Z">
+<meta property="article:author" content="多拉多拉曼">
+<meta property="article:tag" content="NetCore">
+<meta property="article:tag" content="网关">
+<meta property="article:tag" content="微服务">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/img_convert/1889a09b5f8c09e25b35a73e698dab6b.png">
+  
+  
+  
+  <title>dotnetCore微服务API网关-Ocelot学习笔记（一、API网关介绍及Ocelot介绍和配置） - 多拉多拉曼的博客</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"blog.renzhichu.top","root":"/","version":"1.9.1","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>多拉多拉曼</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="dotnetCore微服务API网关-Ocelot学习笔记（一、API网关介绍及Ocelot介绍和配置）"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2021-07-27 17:40" pubdate>
+          2021年7月27日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          <!-- compatible with older versions-->
+          5.6k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          <!-- compatible with older versions-->
+          47 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">dotnetCore微服务API网关-Ocelot学习笔记（一、API网关介绍及Ocelot介绍和配置）</h1>
+            
+            <div class="markdown-body">
+              
+              <h1 id="dotnetCore微服务API网关-Ocelot学习笔记（一、API网关介绍及Ocelot介绍和配置）"><a href="#dotnetCore微服务API网关-Ocelot学习笔记（一、API网关介绍及Ocelot介绍和配置）" class="headerlink" title="dotnetCore微服务API网关-Ocelot学习笔记（一、API网关介绍及Ocelot介绍和配置）"></a>dotnetCore微服务API网关-Ocelot学习笔记（一、API网关介绍及Ocelot介绍和配置）</h1><h2 id="零、为啥写这个"><a href="#零、为啥写这个" class="headerlink" title="零、为啥写这个"></a>零、为啥写这个</h2><p>&amp;ensp;&amp;ensp;&amp;ensp;&amp;ensp;说实话工作用了两年多的微服务了，自己却连工作所用的微服务API网关都没有深入的了解和学习过，只存在于会改会写的阶段，一直觉得特别惭愧，所以自己一直想深入的了解和学习一下，然后近期不是工作不是很忙，就想着研究一下，结果去找网上的文档和博客，这里容我骂句脏话（此处并不针对谁，不服你憋着），找了十篇，结果八篇内容都差不多，全都是把官方文档的架构图拿来翻译一下，然后就是按照官方示例贴代码，让人整个看下来还是一脸懵逼，不懂还是不懂，而且找来找去就那么几篇，也不知道是这网关没人用,还是说DotNet生态不好。没办法，只能自己扒拉源码，然后把自己的理解写下来，希望对其他人也能有一些帮助。当然，要是没帮助那算了。我也不是大佬，只能理解到这种程度，或许以后有新的理解了我会把这篇文档重新写一遍，大家共同学习进步吧。</p>
+<h2 id="一、关于什么是API网关"><a href="#一、关于什么是API网关" class="headerlink" title="一、关于什么是API网关"></a>一、关于什么是API网关</h2><p>&amp;ensp;&amp;ensp;&amp;ensp;&amp;ensp;API网关通常是指。。。我特么也不知道怎么讲(lll￢ω￢)，通俗点大白话讲，网关在我眼里其实就是某个微服务系统的统一入口，所有对该系统的请求访问都需要通过网关转发，从而不需要分别去请求那些各个独立的服务，而且网关还支持协议转换，外部客户端可以使用Http进行请求，到了网关内部可以转换为RPC去请求具体的服务接口。</p>
+<p>&amp;ensp;&amp;ensp;&amp;ensp;&amp;ensp;要是还不理解的话，给你个场景，自己体会，你有一个非常喜欢的人，然后终于某天你鼓起勇气想当面对她表白，于是你买了一束花准备送给她，当你骑着你心爱的小摩托兴奋无比的到了姑娘家小区门口的时候，突然发现小区西门立着一位带着红箍老大爷拦住了你的脚步，大爷看到你问：“小伙子<strong>找谁啊，要干啥</strong> ”。然后你跟大爷说：“我要去找<strong>几号楼几号楼的XX</strong>，我是她朋友，来找她<strong>送</strong>点东西”，然后大爷掏出一个神奇的小本本让你把身份证及电话号码登记，然后扫码量体温，等你做好以后，大爷拿起门岗的电话，拨通她们家的电话，此时电话一直<strong>没人接</strong>，然后大爷告诉你，家没人，你改天再来吧！然后无情地把你赶走，但是你不死心，你又去到了小区的北门，结果发现<strong>北门锁了</strong>！倔强的你又无奈的去了小区的东门，这次经过一系列的登记和沟通后，东门的大爷说，因为疫情原因我不能让你进去，不过你可以把东西给我我给你转送过去，然后你把鲜花交给大爷，大爷骑着小电电去帮你送，一会大爷回来了，带回来一封<strong>信</strong>，你拆看信上写着你是个好人！但我们不合适,然后你还不死心，天天去送，天天得到的都是同一封信，最后那姑娘直接把信放在了<strong>大爷那</strong>，你一去大爷直接从<strong>抽屉</strong>里拿出了信。</p>
+<blockquote>
+<p>综上所述，我们来梳理下：<br><br>&amp;ensp;&amp;ensp;&amp;ensp;&amp;ensp;首先我们把小区看成是一个微服务的系统，小区内的每栋楼都一&gt;个独立的服务。而门户就可以看成服务的接口。<br><br>&amp;ensp;&amp;ensp;&amp;ensp;&amp;ensp;而此时，我们的小区大爷就可以看作是这个系统的网关<br><br>&amp;ensp;&amp;ensp;&amp;ensp;&amp;ensp;通过上面我们知道网关可以做到：<br><br>&amp;ensp;&amp;ensp;&amp;ensp;&amp;ensp;0、入口统一：网关不在乎你从什么地方来，你是手机客户端也好，PC客户端或者网页客户端也罢，统统都要走网关。<br><br>&amp;ensp;&amp;ensp;&amp;ensp;&amp;ensp;1、超时断开：当你请求长时间没有回应的时候，网关会断开请求<br><br>&amp;ensp;&amp;ensp;&amp;ensp;&amp;ensp;2、路由转发：网关要知道你访问的系统内部地址是哪里(路由地址Route)后并帮你进行转发，把请求转发到具体的服务接口上<br><br>&amp;ensp;&amp;ensp;&amp;ensp;&amp;ensp;3、请求方式限制：要知道你的目的是干什么（POST&#x2F;GET&#x2F;等..）<br><br>&amp;ensp;&amp;ensp;&amp;ensp;&amp;ensp;4、认证鉴权：登记身份（认证、鉴权）<br><br>&amp;ensp;&amp;ensp;&amp;ensp;&amp;ensp;5、负载均衡：就算一个门锁了（网关服务坏掉了），也有其他门（网关）可以处理，不会出现一个网关坏掉整个系统瘫痪的情况出现。<br><br>&amp;ensp;&amp;ensp;&amp;ensp;&amp;ensp;6、协议转换：当你骑着心爱的小摩托（Http请求）来的时候，网关转发的时候可能转换成另一种请求协议，如：GRPC或其他RPC协议（Ocelot好像只支持Http，很尴尬）<br><br>&amp;ensp;&amp;ensp;&amp;ensp;&amp;ensp;7、缓存机制：当你请求频繁并且获取的数据都是一样的时候，其实可以把数据放到网关层面缓存起来，这样可以减少系统的压力<br><br>&amp;ensp;&amp;ensp;&amp;ensp;&amp;ensp;网关还可以做的事情<br><br>&amp;ensp;&amp;ensp;&amp;ensp;&amp;ensp;1、服务降级:当你请求某项资源用时较长或者高峰时，网关会将你的请求降级到你早前设置好的降级策略中，保证接口返回可用的部分数据或者资源。<br><br>&amp;ensp;&amp;ensp;&amp;ensp;&amp;ensp;2、削峰&#x2F;限流:当你的请求过多的时候，容易对服务器造成非常大压力，比如秒杀或者某些需要抢购的活动时，这个时候我们就需要把请求进行削峰&#x2F;限流，提示用户排队等候。（讲到这里，我想到我之前面试一家公司的时候，面试我的那位大哥问了我很经典的搭建秒杀服务的问题，问我如何保证系统稳定和库存，当时对网关不甚了解，虽然讲到降级削峰，也是在接口级别做的，后来面试结束后我很不要脸的问了一下大哥如何处理秒杀的情况，这位大哥给我说了一句：“能在前面做的事情，你为啥非要放在后端做？你这不是给服务器增加压力嘛,削峰和限流是没错，但是我们可以在网关级别进行削峰和限流，甚至一些不重要的数据也可以缓存在网关级别。自此我就记住了网关的这两个功能。直到现在这位大哥还在我微信列表里面，本来想着遇到问题的时候请教一番，但是自始至终不敢打搅人家 －_－b”）<br><br>&amp;ensp;&amp;ensp;&amp;ensp;&amp;ensp;3、网关熔断：当网关检测到某个请求经常超时的时候，就会直接把请求熔断掉。</p>
+</blockquote>
+<h2 id="二、OcelotAPI网关介绍及配置方法："><a href="#二、OcelotAPI网关介绍及配置方法：" class="headerlink" title="二、OcelotAPI网关介绍及配置方法："></a>二、OcelotAPI网关介绍及配置方法：</h2><p>接下来是官方文档原话：</p>
+<blockquote>
+<p>Ocelot is aimed at people using .NET running a micro services &#x2F; service orientated architecture that need a unified point of entry into their system.</p>
+<p>In particular I want easy integration with IdentityServer reference and bearer tokens.</p>
+<p>Ocelot is a bunch of middlewares in a specific order.</p>
+<p>Ocelot manipulates the HttpRequest object into a state specified by its configuration until it reaches a request builder middleware where it creates a HttpRequestMessage object which is used to make a request to a downstream service. The middleware that makes the request is the last thing in the Ocelot pipeline. It does not call the next middleware. There is a piece of middleware that maps the HttpResponseMessage onto the HttpResponse object and that is returned to the client. That is basically it with a bunch of other features.</p>
+</blockquote>
+<p>翻译(大概就这意思，我当初上学的时候去参加四级考试，并且写满了卷子，却得了0分！！所以别指望我的英语水平。)：</p>
+<blockquote>
+<p>Ocelot的目标用户是，使用.Net开发的微服务&#x2F;面向服务的体系结构所需要的一个统一入口站点</p>
+<p>我特别希望能够轻松地对IdentityServer进行引用和承载令牌集成。</p>
+<p>Ocelot 是一群（一堆？）由特性顺序组成的中间件。</p>
+<p>Ocelot操纵HttpRequest对象进入到一个请求构建器中并设置为由其所配置的状态，在那里他创建了一个HttpRequestMessage对象，该对象用于向下游服务发出请求，发出请求的的这个中间件是Ocelot请求管道中最后一个中间件,他并不没有下一个中间件可以调用，但是会有一个中间件将HttpResponseMessage映射给HttpResponse对象，用以返回给客户端。这就是他的基本特性了。</p>
+</blockquote>
+<h3 id="使用方法："><a href="#使用方法：" class="headerlink" title="使用方法："></a>使用方法：</h3><pre><code class="hljs">在使用之前，首先要了解网关项目所需的结构和文件。
+0、网关项目需要使用Asp.Net Core项目，也就是我们说的Web项目（控制台也行，只不过我嫌麻烦）
+1、网关的路由规则均有ocelot.json结构的json文件进行控制，这点跟平常项目的appsettings.json用法一样，并且支持中间添加环境变量如：ocelot.Debug.json，来区分不同环境变量下的网关项目规则。
+
+接下来开始一步步操作：
+首先,创建一个ASP.Net Core项目,我这里选择的是一个空项目，这里就不放图了，然后选择SDK，我用的是3.1的，Net5也行，主要是我还没了解完5，项目创建完以后，使用Nuget包，引用官方的包，命令就不敲了，在我这别想着复制，自己去搜吧。包名：Ocelot。
+然后开始配置启动类吧(Program)：
+</code></pre>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/1889a09b5f8c09e25b35a73e698dab6b.png" srcset="/img/loading.gif" lazyload alt="代码"></p>
+<pre><code class="hljs">因为在Ocelot中路由规则等也是通过配置文件所配置的，所以配置方法和appsettings.json的方法一样，直接通过ConfigureAppConfiguration方法来将配置添加到主机的全局配置中。就像图上写的一样，手动指定Json文件，只要确保Json文件存在就可以了。而第二种就简单多了，直接使用Iconfiguraton拓展方法，调用AddOcelot(this IConfigurationBuilder builder,IWebHostEnvironment env)方法，这样的话Ocelot会在内部先查找“ocelot.json” 和“ocelot.global.json” 文件，然后查找根据环境变量匹配出对应环境变量的文件名，最后通过读取文件等一系列操作，将各个不同文件的规则全部合并到一个文件里面去。
+emmmm...不得不说，这个操作特别骚。（下图是源码）
+</code></pre>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/6db04ec3103ba816332acd1675ae5ee9.png" srcset="/img/loading.gif" lazyload alt="代码"></p>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/37f91d87c6a277816ee92e24997075d8.png" srcset="/img/loading.gif" lazyload alt="代码"></p>
+<pre><code class="hljs">不过这里要说一下，在16.0.1这个版本的时候，AddOcelotBaseUrl()这个方法已经被标记过时了。此时支持的是在Json文件里面去设置基本URL：Please set BaseUrl in ocelot.json GlobalConfiguration.BaseUrl
+</code></pre>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/13cd6cda98e0ddc4647d80fd8180b304.png" srcset="/img/loading.gif" lazyload alt="代码"><br>    在上面配置文件配置之后，我们还需要在主机的Config里面去添加一下中间件管道，此时我们的网关算是集成成功了！不过你以为这就完了？图样！我们还没有去配置规则</p>
+<h2 id="三、OcelotAPI网关路由规则文件："><a href="#三、OcelotAPI网关路由规则文件：" class="headerlink" title="三、OcelotAPI网关路由规则文件："></a>三、OcelotAPI网关路由规则文件：</h2><p>&amp;ensp;&amp;ensp;&amp;ensp;&amp;ensp;如上所说，我们网关路由规则，使用的是Ocelot.json文件进行配置，那么这个规则都可以配置什么呢？他又是如何进行控制的呢？看下图：<br><img src="https://img-blog.csdnimg.cn/img_convert/ed2990ec70dd5f1e5796467d2a121fde.png" srcset="/img/loading.gif" lazyload alt="代码"><br><img src="https://img-blog.csdnimg.cn/img_convert/ae8eaf99e6b00511aeac309bfa309e90.png" srcset="/img/loading.gif" lazyload alt="代码"><br>    这是官方文档提供的配置示例，第一张图呢，是整个Json的结构，第一个字段呢，就是我们需要配置的路由规则，这是个数组类型，为的就是让我们配置多个服务的路由规则 <del>（废话）</del> 然后第二张图呢，就是路由的所有规则了，字段太多我就不一一介绍了，反正你记住 Down开头的一般都是配置下游服务的规则，比如下游服务的路径模板，下游服务以允许的HTTP方法，下游服务的HTTP版本和主机地址及端口之类的东西。Up开头的呢，一般都是上游主机服务一些规则。<br>    具体字段后面单开篇幅介绍好了。现在只介绍一下这些个字段，然后我们就会有一个问题，这些个字段是怎么去控制程序执行的呢？<br>    <img src="https://img-blog.csdnimg.cn/img_convert/38ba5cbec126c1f9522cc671aa02ec80.png" srcset="/img/loading.gif" lazyload alt="代码"><br>    <img src="https://img-blog.csdnimg.cn/img_convert/98da378abaaa45bb5403dcb3f4d9c354.png" srcset="/img/loading.gif" lazyload alt="代码"><br>    <img src="https://img-blog.csdnimg.cn/img_convert/eea44a1a094cee37dcab35fae6ea1d20.png" srcset="/img/loading.gif" lazyload alt="代码"><br>    看一下注册服务时候调用的AddOcelot()函数，我们可以看出，他在方法里先是获取了项目的全局配置，然后实例化了一个OcelotBuilder类，并将配置传了进去，当我点击去看之后，我惊呆了，我特么第一次见这么长的构造函数，不过不要紧，下面全是依赖注入的东西，我们先放一边，直接看上面那一段的操作。通过注册TOptions配置实例绑定的方法，Ocelot将配置文件绑定到了一个FileConfiguration类中，点开这个类你会发现，这里面则全都是我们Json文件配置的东西，而通过配置的绑定，我们所指定的规则，则全都会赋值到这个类里面，并且在下面使之通过依赖注入注入到根容器中，以待使用的时候可以控制。</p>
+<h2 id="四、结束语："><a href="#四、结束语：" class="headerlink" title="四、结束语："></a>四、结束语：</h2><pre><code class="hljs">时间不早了，媳妇催我睡觉了，剩下的下章在讲。拜拜各位。早睡早起身体好
+</code></pre>
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/NetCore/" class="category-chain-item">NetCore</a>
+  
+  
+
+      </span>
+    
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E5%BE%AE%E6%9C%8D%E5%8A%A1/" class="category-chain-item">微服务</a>
+  
+  
+
+      </span>
+    
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E7%BD%91%E5%85%B3/" class="category-chain-item">网关</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/NetCore/">#NetCore</a>
+      
+        <a href="/tags/%E7%BD%91%E5%85%B3/">#网关</a>
+      
+        <a href="/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/">#微服务</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>dotnetCore微服务API网关-Ocelot学习笔记（一、API网关介绍及Ocelot介绍和配置）</div>
+      <div>http://blog.renzhichu.top/2021/07/27/网关/dotnetCore微服务API网关-Ocelot学习笔记（一、API网关介绍及Ocelot介绍和配置）/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>多拉多拉曼</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2021年7月27日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2021/08/23/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/Rabbitmq%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" title="Rabbitmq学习笔记">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Rabbitmq学习笔记</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/tocbot@4.12.3/dist/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/clipboard@2.0.8/dist/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/anchor-js@4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
